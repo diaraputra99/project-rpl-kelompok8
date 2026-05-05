@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>RestoFlow – Warkop HS Prototype</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="console.log('qr lib fallback')"></script>
 <style>
 :root {
   --bg: #FAF3EC;
@@ -678,6 +679,278 @@ body {
   text-transform: uppercase; letter-spacing: 0.8px;
 }
  
+/* ===================== PAYMENT SCREENS ===================== */
+.payment-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 0;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pay-tab {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: 'Nunito', sans-serif;
+  background: none; color: var(--text-muted);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.pay-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+}
+
+.form-section {
+  background: var(--white);
+  margin: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 14px;
+}
+.form-section-title {
+  font-size: 13px; font-weight: 800; color: var(--text);
+  margin-bottom: 12px;
+}
+.form-field {
+  margin-bottom: 10px;
+}
+.form-field label {
+  display: block;
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 5px;
+}
+.form-field input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px 10px 36px;
+  font-size: 13px; color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-field input:focus { border-color: var(--primary); }
+.form-field .field-icon {
+  position: absolute;
+  left: 10px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+}
+.form-field .field-wrap { position: relative; }
+
+.method-selector {
+  display: flex;
+  gap: 10px;
+  margin: 12px 16px;
+}
+.method-btn {
+  flex: 1;
+  padding: 12px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--white);
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: 'Nunito', sans-serif;
+  color: var(--text-2);
+  transition: all 0.15s;
+  text-align: center;
+}
+.method-btn.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.qris-checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 0 16px;
+  border: 1px solid var(--border);
+}
+.qris-checkbox-row input[type="checkbox"] {
+  margin-top: 2px; flex-shrink:0;
+  accent-color: var(--primary);
+  width: 16px; height: 16px;
+  cursor: pointer;
+}
+.qris-checkbox-row label {
+  font-size: 11px; color: var(--text-2); line-height: 1.5;
+  cursor: pointer;
+}
+.qris-checkbox-row a { color: var(--primary); text-decoration: none; font-weight: 700; }
+
+.pay-total-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pay-total-bar .total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.pay-total-bar .total-amount { font-size: 15px; font-weight: 800; color: var(--text); }
+.pay-now-btn {
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer; font-family: 'Nunito', sans-serif;
+  box-shadow: 0 4px 16px rgba(232,160,32,0.35);
+  transition: all 0.15s;
+}
+.pay-now-btn:hover { transform: scale(1.03); }
+
+/* ===== QRIS Screen ===== */
+.qris-countdown {
+  text-align: center;
+  padding: 12px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.qris-countdown .countdown-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+.qris-countdown .countdown-timer {
+  font-size: 32px; font-weight: 800; color: var(--danger);
+  font-family: 'Playfair Display', serif;
+  line-height: 1.2;
+}
+
+.qris-card {
+  margin: 12px 16px;
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+.qris-card-header {
+  background: linear-gradient(135deg, #cc0000, #e00000);
+  padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.qris-card-header .qris-logo {
+  font-size: 11px; font-weight: 800; color: white; letter-spacing: 2px;
+}
+.qris-card-body {
+  padding: 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+#qrisCanvas {
+  border-radius: 8px;
+  border: 4px solid white;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.qris-merchant {
+  text-align: center;
+}
+.qris-merchant .merchant-name { font-size: 13px; font-weight: 800; color: var(--text); }
+.qris-merchant .merchant-id { font-size: 10px; color: var(--text-muted); }
+
+.qris-total-row {
+  display: flex; align-items:center; justify-content:space-between;
+  width: 100%; padding: 8px 14px;
+  border-top: 1px solid var(--border);
+}
+.qris-total-row .ql { font-size: 13px; color: var(--text-2); font-weight: 600; }
+.qris-total-row .qa { font-size: 15px; font-weight: 800; color: var(--text); }
+
+.cek-status-btn {
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer; font-family: 'Nunito', sans-serif;
+  width: 100%;
+  transition: all 0.15s;
+  box-shadow: 0 4px 16px rgba(232,160,32,0.35);
+}
+.cek-status-btn:hover { background: var(--primary); color: white; }
+
+.download-qr-btn {
+  width: 44px; height: 44px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--white);
+  cursor: pointer; font-size: 18px;
+  display: flex; align-items:center; justify-content:center;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+.download-qr-btn:hover { border-color: var(--primary); }
+
+.cara-bayar-section {
+  margin: 0 16px 12px;
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 14px;
+}
+.cara-bayar-section h4 { font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+.cara-step {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-bottom: 10px;
+}
+.cara-step:last-child { margin-bottom: 0; }
+.cara-step .step-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--primary-light); border: 1.5px solid var(--primary);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 11px; font-weight: 800; color: var(--primary-dark);
+  flex-shrink: 0;
+}
+.cara-step .step-text { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.cara-step .step-text strong { color: var(--text); }
+
+/* ===== Payment Success Screen ===== */
+.pay-success-wrap {
+  flex: 1;
+  display: flex; flex-direction:column; align-items:center; justify-content:center;
+  padding: 30px 20px; gap: 14px; text-align:center;
+}
+.pay-success-wrap .big-check {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, #2E7D52, #4CAF80);
+  border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  font-size: 36px;
+  box-shadow: 0 8px 24px rgba(46,125,82,0.3);
+}
+.pay-success-wrap h3 { font-size: 22px; font-weight: 800; color: var(--success); }
+.pay-success-wrap p { font-size: 13px; color: var(--text-muted); max-width:260px; line-height:1.5; }
+.receipt-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  width: 100%;
+  text-align: left;
+}
+.receipt-row {
+  display: flex; justify-content:space-between;
+  padding: 6px 0;
+  font-size: 13px; color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+}
+.receipt-row:last-child { border-bottom: none; font-weight: 800; color: var(--text); font-size: 14px; }
+.receipt-row .rk { font-weight: 600; }
+.receipt-row .rv { font-weight: 700; color: var(--text); }
+
 /* Notification toast */
 .toast {
   position: absolute;
@@ -964,7 +1237,7 @@ body {
           <textarea placeholder="Contoh: tanpa sambal, tambah es batu..." style="width:100%;border:none;background:none;font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);resize:none;outline:none;height:60px;"></textarea>
         </div>
       </div>
-      <button class="checkout-btn" onclick="doCheckout()">Konfirmasi Pesanan →</button>
+      <button class="checkout-btn" onclick="goToPayment()">Lanjut Pembayaran →</button>
     </div>
   </div>
  
@@ -989,6 +1262,205 @@ body {
     </div>
   </div>
  
+  <!-- ===================== PEMBAYARAN (Form) ===================== -->
+  <div class="screen" id="screen-payment">
+    <div class="status-bar"><span class="time">20:15</span><div class="icons">📶 🔋</div></div>
+    <div class="topbar">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <h2>Pembayaran</h2>
+    </div>
+    <div class="payment-tabs">
+      <button class="pay-tab active" id="ptab-dine">Tipe Pemesanan</button>
+      <button class="pay-tab" style="background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark);">Makan di tempat 🍽️</button>
+    </div>
+    <div class="scroll-content" style="padding-bottom:10px;">
+      <div class="form-section">
+        <div class="form-section-title">Informasi Pemesan</div>
+        <div class="form-field">
+          <label>Nama Lengkap</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input type="text" id="pay-name" placeholder="Nama Lengkap">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Nomor Ponsel</label>
+          <div class="field-wrap">
+            <span class="field-icon">📞</span>
+            <input type="tel" id="pay-phone" placeholder="Nomor Ponsel">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Kirim struk ke email</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉️</span>
+            <input type="email" id="pay-email" placeholder="Email">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Nomor Meja</label>
+          <div class="field-wrap">
+            <span class="field-icon">🪑</span>
+            <input type="text" id="pay-table" value="7" readonly style="background:var(--primary-light);color:var(--primary-dark);font-weight:700;">
+          </div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text-2);border:1px solid var(--border);">
+          Kamu pesan dari &nbsp;<strong>Warkop HS Balio</strong>
+        </div>
+      </div>
+
+      <div style="padding:0 16px 8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Metode Pembayaran</div>
+        <div class="method-selector" id="methodSelector">
+          <button class="method-btn active" id="method-online" onclick="selectMethod('online')">💳 Pembayaran Online</button>
+          <button class="method-btn" id="method-cash" onclick="selectMethod('cash')">💵 Bayar di Kasir</button>
+        </div>
+      </div>
+
+      <div id="qris-section">
+        <div style="padding:0 16px;margin-bottom:10px;">
+          <div style="background:var(--white);border-radius:12px;border:1.5px solid var(--border);padding:14px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#cc0000,#e00000);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white;letter-spacing:0.5px;font-size:8px;">QRIS</div>
+              <span style="font-size:13px;font-weight:700;color:var(--text);">QRIS</span>
+            </div>
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;">✓</div>
+          </div>
+        </div>
+        <div class="qris-checkbox-row">
+          <input type="checkbox" id="syarat-check" checked>
+          <label for="syarat-check">Saya setuju dengan <a href="#">Syarat &amp; Ketentuan</a> dan <a href="#">Kebijakan Privasi</a></label>
+        </div>
+      </div>
+
+      <div id="cash-info-section" style="display:none;padding:0 16px;">
+        <div style="background:var(--primary-light);border-radius:12px;border:1px solid var(--primary);padding:14px;font-size:12px;color:var(--text-2);line-height:1.6;">
+          🧾 Klik <strong>'Bayar di Kasir'</strong> lalu tunjukkan QR ke kasir untuk proses pembayaran tunai.
+        </div>
+      </div>
+    </div>
+
+    <div class="pay-total-bar">
+      <div>
+        <div class="total-label">Total Pembayaran ∧</div>
+        <div class="total-amount" id="pay-total-display">Rp0</div>
+      </div>
+      <button class="pay-now-btn" onclick="proceedToQRIS()">Bayar</button>
+    </div>
+  </div>
+
+  <!-- ===================== QRIS SCREEN ===================== -->
+  <div class="screen" id="screen-qris">
+    <div class="status-bar"><span class="time">20:15</span><div class="icons">📶 🔋</div></div>
+    <div class="topbar">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <h2>Pembayaran</h2>
+    </div>
+    <div class="qris-countdown">
+      <div class="countdown-label">Selesaikan pembayaran dalam waktu</div>
+      <div class="countdown-timer" id="countdown">10:00</div>
+    </div>
+    <div class="scroll-content" style="padding-bottom:10px;">
+      <div class="qris-card">
+        <div class="qris-card-header">
+          <div style="display:flex;flex-direction:column;">
+            <span style="font-size:16px;font-weight:800;color:white;letter-spacing:2px;">QRIS</span>
+            <span style="font-size:9px;color:rgba(255,255,255,0.8);letter-spacing:1px;">QR Code Standar Nasional Indonesia</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <div style="width:28px;height:28px;background:white;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#cc0000;">GPN</div>
+          </div>
+        </div>
+        <div class="qris-card-body">
+          <div class="qris-merchant">
+            <div class="merchant-name">SYAARI, MAKANAN &amp; MINUMAN</div>
+            <div class="merchant-id">NMID: 101234567891234</div>
+          </div>
+          <div id="qrisContainer" style="border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.12);background:white;padding:8px;display:inline-block;"></div>
+        </div>
+        <div class="qris-total-row">
+          <span class="ql">Total Pembayaran</span>
+          <span class="qa" id="qris-total-amount">Rp0</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;padding:0 16px;margin-bottom:12px;">
+        <button class="cek-status-btn" onclick="simulatePaymentSuccess()">Cek Status Pembayaran</button>
+        <button class="download-qr-btn" onclick="downloadQR()" title="Download QR">⬇️</button>
+      </div>
+
+      <div class="cara-bayar-section">
+        <h4>Cara Pembayaran:</h4>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button onclick="switchPayPhone('same')" id="pphone-same" style="flex:1;padding:8px;border:1.5px solid var(--primary);border-radius:8px;background:var(--primary-light);font-size:11px;font-weight:700;color:var(--primary-dark);cursor:pointer;font-family:'Nunito',sans-serif;">📱 Bayar dengan<br>ponsel yang sama</button>
+          <button onclick="switchPayPhone('other')" id="pphone-other" style="flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:none;font-size:11px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:'Nunito',sans-serif;">📲 Bayar dengan<br>ponsel lain</button>
+        </div>
+        <div class="cara-step">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>Screenshot</strong> kode QRIS</div>
+        </div>
+        <div class="cara-step">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>Buka pembayaran QRIS</strong> di m-banking atau e-wallet kamu</div>
+        </div>
+        <div class="cara-step">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>Unggah</strong> gambar/hasil screenshot kode QRIS</div>
+        </div>
+        <div class="cara-step">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>Pastikan</strong> jumlah transaksimu dan lakukan pembayaran</div>
+        </div>
+        <div class="cara-step">
+          <div class="step-num">5</div>
+          <div class="step-text">Klik <strong>Cek Status Pembayaran</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAYMENT SUCCESS ===================== -->
+  <div class="screen" id="screen-pay-success">
+    <div class="status-bar"><span class="time">17:08</span><div class="icons">📶 🔋</div></div>
+    <div class="topbar"><h2>ESB Order</h2></div>
+    <div style="flex:1;display:flex;flex-direction:column;">
+      <div class="pay-success-wrap">
+        <div class="big-check">✅</div>
+        <h3>Pembayaran Berhasil!</h3>
+        <div style="font-size:14px;color:var(--text-muted);font-weight:600;">Total Pembayaran</div>
+        <div style="font-size:28px;font-weight:800;color:var(--text);" id="success-amount">Rp0</div>
+
+        <div class="receipt-card" id="receiptCard">
+          <div class="receipt-row">
+            <span class="rk">No. Order</span>
+            <span class="rv" id="success-order-code">#RFW00000000</span>
+          </div>
+          <div class="receipt-row">
+            <span class="rk">Metode</span>
+            <span class="rv">QRIS</span>
+          </div>
+          <div class="receipt-row">
+            <span class="rk">Waktu</span>
+            <span class="rv" id="success-time">-</span>
+          </div>
+          <div class="receipt-row">
+            <span class="rk">Meja</span>
+            <span class="rv">7</span>
+          </div>
+          <div class="receipt-row">
+            <span class="rk">Total</span>
+            <span class="rv" id="success-total-receipt">Rp0</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;width:100%;">
+          <button onclick="showToast('Struk diunduh!')" style="flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text-2);">⬇️ Unduh Struk</button>
+          <button onclick="goTo('screen-menu','slide-in-left');cart={};updateCartFab();" style="flex:1;background:var(--primary);color:var(--white);border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">🍽️ Ke Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== HAMBURGER MENU ===================== -->
   <div id="hamburger-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;" onclick="closeHamburger()">
     <div id="hamburger-panel" style="position:absolute;top:0;right:0;width:240px;height:100%;background:var(--white);padding:0;box-shadow:-4px 0 20px rgba(0,0,0,0.15);" onclick="event.stopPropagation()">
@@ -1096,6 +1568,7 @@ function goTo(screenId, animation='slide-in') {
   screenHistory.push(screenId);
   currentScreen = screenId;
   if (screenId === 'screen-cart') renderCart();
+  if (screenId !== 'screen-qris' && countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
 }
  
 function goBack() {
@@ -1268,6 +1741,152 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
  
+// ===================== PAYMENT FLOW =====================
+let paymentMethod = 'online';
+let countdownInterval = null;
+
+function goToPayment() {
+  const cartArr = Object.entries(cart).map(([id,qty]) => ({...menuData.find(m=>m.id==id), qty}));
+  if (cartArr.length === 0) { showToast('Keranjang kosong!'); return; }
+  const subtotal = cartArr.reduce((s,i)=>s+i.price*i.qty, 0);
+  document.getElementById('pay-total-display').textContent = 'Rp' + subtotal.toLocaleString('id');
+  goTo('screen-payment','slide-in');
+}
+
+function selectMethod(method) {
+  paymentMethod = method;
+  document.getElementById('method-online').classList.toggle('active', method==='online');
+  document.getElementById('method-cash').classList.toggle('active', method==='cash');
+  document.getElementById('qris-section').style.display = method==='online' ? 'block' : 'none';
+  document.getElementById('cash-info-section').style.display = method==='cash' ? 'block' : 'none';
+}
+
+function proceedToQRIS() {
+  const cartArr = Object.entries(cart).map(([id,qty]) => ({...menuData.find(m=>m.id==id), qty}));
+  const subtotal = cartArr.reduce((s,i)=>s+i.price*i.qty, 0);
+  document.getElementById('qris-total-amount').textContent = 'Rp' + subtotal.toLocaleString('id');
+  goTo('screen-qris','slide-in');
+  generateQRIS(subtotal);
+  startCountdown(10 * 60);
+}
+
+function generateQRIS(amount) {
+  const canvas = document.getElementById('qrisCanvas');
+  const ctx = canvas.getContext('2d');
+  const size = 200;
+  
+  // Generate QR data string (simulated QRIS format)
+  const qrData = `WARKOPHS|NMID101234567891234|MEJA7|AMT${amount}|${Date.now()}`;
+  
+  // Use qrcode.js if available, else draw our own pattern
+  if (typeof QRCode !== 'undefined') {
+    canvas.width = size; canvas.height = size;
+    QRCode.toCanvas(canvas, qrData, {width: size, margin: 1, color:{dark:'#1A1208',light:'#FFFFFF'}});
+  } else {
+    drawSimQR(ctx, size, qrData, amount);
+  }
+}
+
+function drawSimQR(ctx, size, data, amount) {
+  // Draw a realistic-looking QR code pattern
+  const modules = 25;
+  const cellSize = size / modules;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0,0,size,size);
+  
+  // Seeded pseudo-random based on amount for consistency
+  let seed = amount + 12345;
+  function rand() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+  
+  // Draw data modules
+  ctx.fillStyle = '#1A1208';
+  for (let r=0;r<modules;r++) {
+    for (let c=0;c<modules;c++) {
+      // Skip finder pattern areas
+      const inFinder = (r<8&&c<8)||(r<8&&c>modules-9)||(r>modules-9&&c<8);
+      const inTiming = (r===6&&c>7&&c<modules-8)||(c===6&&r>7&&r<modules-8);
+      if (inFinder||inTiming) continue;
+      if (rand() > 0.5) {
+        ctx.fillRect(c*cellSize, r*cellSize, cellSize-0.5, cellSize-0.5);
+      }
+    }
+  }
+  
+  // Draw finder patterns (top-left, top-right, bottom-left)
+  [[0,0],[0,modules-7],[modules-7,0]].forEach(([row,col]) => {
+    ctx.fillStyle='#1A1208';
+    ctx.fillRect(col*cellSize,row*cellSize,7*cellSize,7*cellSize);
+    ctx.fillStyle='#FFFFFF';
+    ctx.fillRect((col+1)*cellSize,(row+1)*cellSize,5*cellSize,5*cellSize);
+    ctx.fillStyle='#1A1208';
+    ctx.fillRect((col+2)*cellSize,(row+2)*cellSize,3*cellSize,3*cellSize);
+  });
+  
+  // Timing patterns
+  ctx.fillStyle='#1A1208';
+  for(let i=8;i<modules-8;i++) {
+    if(i%2===0) {
+      ctx.fillRect(6*cellSize,i*cellSize,cellSize,cellSize);
+      ctx.fillRect(i*cellSize,6*cellSize,cellSize,cellSize);
+    }
+  }
+}
+
+function downloadQR() {
+  const canvas = document.getElementById('qrisCanvas');
+  const link = document.createElement('a');
+  link.download = 'QRIS-WarkopHS.png';
+  link.href = canvas.toDataURL();
+  link.click();
+  showToast('QR Code diunduh!');
+}
+
+function startCountdown(seconds) {
+  if (countdownInterval) clearInterval(countdownInterval);
+  let remaining = seconds;
+  function update() {
+    const m = Math.floor(remaining/60).toString().padStart(2,'0');
+    const s = (remaining%60).toString().padStart(2,'0');
+    const el = document.getElementById('countdown');
+    if (el) el.textContent = m + ':' + s;
+    if (remaining <= 0) {
+      clearInterval(countdownInterval);
+      if (el) el.textContent = '00:00';
+      showToast('Waktu pembayaran habis!');
+    }
+    remaining--;
+  }
+  update();
+  countdownInterval = setInterval(update, 1000);
+}
+
+function simulatePaymentSuccess() {
+  clearInterval(countdownInterval);
+  const cartArr = Object.entries(cart).map(([id,qty])=>({...menuData.find(m=>m.id==id),qty}));
+  const subtotal = cartArr.reduce((s,i)=>s+i.price*i.qty,0);
+  const code = '#RFW' + Date.now().toString().slice(-8);
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) + ', ' + now.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+  
+  document.getElementById('success-amount').textContent = 'Rp'+subtotal.toLocaleString('id');
+  document.getElementById('success-order-code').textContent = code;
+  document.getElementById('success-time').textContent = timeStr;
+  document.getElementById('success-total-receipt').textContent = 'Rp'+subtotal.toLocaleString('id');
+  
+  cart = {};
+  updateCartFab();
+  goTo('screen-pay-success','slide-in');
+}
+
+function switchPayPhone(mode) {
+  document.getElementById('pphone-same').style.borderColor = mode==='same' ? 'var(--primary)' : 'var(--border)';
+  document.getElementById('pphone-same').style.background = mode==='same' ? 'var(--primary-light)' : 'none';
+  document.getElementById('pphone-same').style.color = mode==='same' ? 'var(--primary-dark)' : 'var(--text-muted)';
+  document.getElementById('pphone-other').style.borderColor = mode==='other' ? 'var(--primary)' : 'var(--border)';
+  document.getElementById('pphone-other').style.background = mode==='other' ? 'var(--primary-light)' : 'none';
+  document.getElementById('pphone-other').style.color = mode==='other' ? 'var(--primary-dark)' : 'var(--text-muted)';
+}
+
 // ===================== INIT =====================
 renderMenu(menuData);
 </script>
