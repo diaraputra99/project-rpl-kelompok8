@@ -1,0 +1,228 @@
+/* ===================== VARIABLES ===================== */
+:root {
+  --bg:           #FAF3EC;
+  --white:        #FFFFFF;
+  --primary:      #B8860B;
+  --primary-light:#F5E9C9;
+  --primary-dark: #8B6508;
+  --text:         #1A1208;
+  --text-2:       #5A4A30;
+  --text-muted:   #9A8A70;
+  --border:       #E8DCC8;
+  --success:      #2E7D52;
+  --success-bg:   #EAF4EE;
+  --card-shadow:  0 2px 12px rgba(139, 101, 8, 0.1);
+  --radius:       14px;
+}
+
+/* ===================== LAYOUT ===================== */
+.order-detail-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===================== STATUS BAR ===================== */
+.status-bar {
+  height: 48px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.status-bar .time {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.status-bar .icons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* ===================== TOP BAR ===================== */
+.topbar {
+  background: var(--white);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.back-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.back-btn:hover {
+  background: var(--primary-light);
+}
+
+.topbar h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+
+/* ===================== SCROLL CONTENT ===================== */
+.scroll-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.scroll-content::-webkit-scrollbar {
+  width: 0;
+}
+
+.content-padding {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===================== CODE CARD ===================== */
+.code-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+}
+
+.code-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.code-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: monospace;
+  margin-bottom: 12px;
+}
+
+.badge-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-success {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.badge-muted {
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+/* ===================== ITEMS CARD ===================== */
+.items-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+}
+
+.items-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.item-name {
+  flex: 1;
+}
+
+.item-price {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Total row */
+.total-row {
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+  padding-top: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.total-price {
+  color: var(--primary);
+}
+
+/* ===================== REORDER BUTTON ===================== */
+.reorder-btn {
+  width: 100%;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  box-shadow: 0 4px 16px rgba(184, 134, 11, 0.3);
+  transition: background 0.15s, transform 0.15s;
+}
+
+.reorder-btn:hover {
+  background: var(--primary-dark);
+}
+
+.reorder-btn:active {
+  transform: scale(0.98);
+}
