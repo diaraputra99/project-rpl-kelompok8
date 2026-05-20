@@ -1,0 +1,222 @@
+.laporan-container {
+  padding: 28px;
+  max-width: 1100px;
+}
+
+.laporan-header-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.laporan-header-box h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.laporan-header-box p {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.export-btn-group {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-export-excel {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.btn-export-pdf {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--danger);
+  color: var(--white);
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.period-toolbar-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.period-toggle-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.period-toggle-btn.active {
+  background-color: var(--bg);
+  color: var(--white);
+  border: 1.5px solid var(--bg);
+}
+
+.period-toggle-btn.inactive {
+  background-color: var(--white);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+}
+
+.period-meta-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+.laporan-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.laporan-stat-card {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  padding: 18px 20px;
+}
+
+.laporan-stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.laporan-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.filter-toolbar-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.laporan-search-input {
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  outline: none;
+  background: var(--white);
+  color: var(--text);
+  width: 220px;
+}
+
+.dropdown-anchor-wrapper {
+  position: relative;
+}
+
+.dropdown-trigger-btn {
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-floating-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  z-index: 20;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  min-width: 160px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+}
+
+.dropdown-floating-item {
+  padding: 10px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dropdown-floating-item.selected {
+  color: var(--accent);
+  font-weight: 700;
+  background: #fff8f4;
+}
+
+.dropdown-floating-item.unselected {
+  color: var(--text);
+  font-weight: 400;
+  background: var(--white);
+}
+
+.toolbar-counter-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  align-self: center;
+}
+
+.laporan-table-card {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+}
+
+.laporan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.laporan-table th {
+  background-color: var(--bg-main);
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+}
+
+.laporan-table tr {
+  border-top: 1px solid var(--border);
+}
+
+.laporan-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+}
+
+.method-badge-pill {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}

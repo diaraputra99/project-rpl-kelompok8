@@ -1,0 +1,32 @@
+:root {
+  --bg: #1a1008;
+  --bg-side: #221508;
+  --bg-card: #2c1c0e;
+  --bg-main: #f5ede6;
+  --bg-content: #fdf8f5;
+  --accent: #8B5E3C;
+  --accent-dark: #6b4528;
+  --accent-light: #c4956a;
+  --warn: #e07b39;
+  --warn-bg: #fff3eb;
+  --success: #2e8b57;
+  --success-bg: #eaf5ee;
+  --danger: #c0392b;
+  --danger-bg: #fdf0ef;
+  --gray: #888888;
+  --border: #e8ddd5;
+  --text: #2c1c0e;
+  --text-muted: #7a6555;
+  --text-light: #a89080;
+  --white: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background-color: var(--bg-content);
+}
+
+* {
+  box-sizing: border-box;
+}

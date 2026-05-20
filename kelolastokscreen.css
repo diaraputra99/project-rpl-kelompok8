@@ -1,0 +1,192 @@
+.stok-container {
+  padding: 28px;
+  max-width: 1100px;
+}
+
+.stok-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.stok-header p {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.alert-critical-banner {
+  background-color: var(--warn-bg);
+  border: 1px solid #fcd34d;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #92400e;
+}
+
+.stok-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stok-stat-card {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  padding: 18px 20px;
+}
+
+.stok-stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.stok-stat-value {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.stok-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stok-search {
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  outline: none;
+  background: var(--white);
+  color: var(--text);
+  width: 220px;
+}
+
+.stok-filter-btn {
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.stok-filter-btn.active {
+  background-color: var(--bg);
+  color: var(--white);
+  border: 1.5px solid var(--bg);
+}
+
+.stok-filter-btn.inactive {
+  background-color: var(--white);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+}
+
+.stok-table-card {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+}
+
+.stok-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stok-table th {
+  background-color: var(--bg-main);
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+}
+
+.stok-table tr {
+  border-top: 1px solid var(--border);
+}
+
+.stok-table td {
+  padding: 12px 16px;
+}
+
+.status-indicator-badge {
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inline-edit-box {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.inline-edit-input {
+  width: 60px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1.5px solid var(--accent);
+  font-size: 13px;
+  outline: none;
+}
+
+.btn-inline-save {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background-color: var(--success);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-inline-cancel {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.display-stock-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-trigger-edit {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.stock-progress-track {
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  height: 8px;
+  width: 120px;
+}
+
+.stock-progress-bar {
+  height: 8px;
+  border-radius: 6px;
+  transition: width 0.3s;
+}
