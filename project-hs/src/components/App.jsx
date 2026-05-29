@@ -265,18 +265,7 @@ function MenuScreen({ cart, onAdd, onRemove, onCartClick, onStoreClick, showToas
       flex: 1, display: "flex", flexDirection: "column",
       background: "#FAF3EC", overflow: "hidden",
     }}>
-      {/* Status Bar */}
-      <div style={{
-        height: 48, background: "#fff",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "0 20px", fontSize: 12, fontWeight: 700, color: "#1A1208",
-        borderBottom: "1px solid #E8DCC8", flexShrink: 0,
-      }}>
-        <span style={{ fontSize: 15, fontWeight: 800 }}>
-          {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
-        </span>
-        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>📶 🔋</div>
-      </div>
+      
 
       {/* Header */}
       <div style={{
