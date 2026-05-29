@@ -459,18 +459,7 @@ function CartScreen({ cart, onAdd, onRemove, onBack, onCheckout, showToast }) {
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FAF3EC" }}>
-      {/* Status bar */}
-      <div style={{
-        height: 48, background: "#fff", display: "flex", alignItems: "center",
-        justifyContent: "space-between", padding: "0 20px",
-        borderBottom: "1px solid #E8DCC8", flexShrink: 0,
-      }}>
-        <span style={{ fontSize: 15, fontWeight: 800 }}>
-          {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
-        </span>
-        <div>📶 🔋</div>
-      </div>
-
+      
       {/* Topbar */}
       <div style={{
         background: "#fff", padding: "12px 16px",
