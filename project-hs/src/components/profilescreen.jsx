@@ -50,12 +50,6 @@ export default function ProfileScreen({
   return (
     <div className="profile-screen">
 
-      {/* STATUS BAR */}
-      <div className="status-bar">
-        <span className="time">20:15</span>
-        <div className="icons">📶 🔋</div>
-      </div>
-
       {/* TOP BAR */}
       <div className="topbar">
         <h2>Profil</h2>

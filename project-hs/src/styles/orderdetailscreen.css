@@ -25,31 +25,6 @@
   overflow: hidden;
 }
 
-/* ===================== STATUS BAR ===================== */
-.status-bar {
-  height: 48px;
-  background: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text);
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.status-bar .time {
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.status-bar .icons {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
 
 /* ===================== TOP BAR ===================== */
 .topbar {

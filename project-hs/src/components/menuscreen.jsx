@@ -148,12 +148,6 @@ export default function MenuScreen({
   return (
     <div className="menu-screen">
 
-      {/* STATUS BAR */}
-      <div className="status-bar">
-        <span className="time">20:15</span>
-        <div className="icons">📶 🔋</div>
-      </div>
-
       {/* HEADER */}
       <div className="menu-header">
         <div className="table-info">

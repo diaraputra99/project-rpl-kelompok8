@@ -94,12 +94,7 @@ export default function CartScreen({
   return (
     <div className="cart-screen">
 
-      {/* STATUS BAR */}
-      <div className="status-bar">
-        <span className="time">20:15</span>
-        <div className="icons">📶 🔋</div>
-      </div>
-
+    
       {/* TOP BAR */}
       <div className="topbar">
         <button className="back-btn" onClick={onBack}>←</button>

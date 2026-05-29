@@ -40,11 +40,6 @@ export default function LanguageScreen({ onBack, onShowToast }) {
   return (
     <div className="language-screen">
 
-      {/* STATUS BAR */}
-      <div className="status-bar">
-        <span className="time">20:15</span>
-        <div className="icons">📶 🔋</div>
-      </div>
 
       {/* TOP BAR */}
       <div className="topbar">
