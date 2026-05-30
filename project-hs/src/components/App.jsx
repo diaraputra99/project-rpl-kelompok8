@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "../supabase";
+import PaymentScreen from "./paymentscreen.jsx";
+import QRISScreen from "./QRISscreen.jsx";
 
 // ===================== HELPERS =====================
 const formatRp = (n) => "Rp" + Number(n).toLocaleString("id-ID");
@@ -163,6 +165,7 @@ function MenuScreen({ cart, onAdd, onRemove, onCartClick, showToast }) {
   const [loading, setLoading]               = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchData() {
       setLoading(true);
       const { data: cats } = await supabase.from("categories").select("*").order("name");
@@ -170,14 +173,26 @@ function MenuScreen({ cart, onAdd, onRemove, onCartClick, showToast }) {
         .from("menus")
         .select("*, categories(name)")
         .order("name");
-      if (cats) setCategories(cats);
+      if (!isMounted) return;
+      // FIX: Dedup categories berdasarkan name
+      if (cats) {
+        const seen = new Set();
+        const uniqueCats = cats.filter(c => {
+          if (seen.has(c.name)) return false;
+          seen.add(c.name);
+          return true;
+        });
+        setCategories(uniqueCats);
+      }
       if (menus) setMenuData(menus);
       setLoading(false);
     }
     fetchData();
+    return () => { isMounted = false; };
   }, []);
 
-  const allCategories = ["Semua", ...categories.map(c => c.name)];
+  // FIX: Pakai Set untuk jaga-jaga duplikat nama kategori
+  const allCategories = ["Semua", ...new Set(categories.map(c => c.name))];
 
   const filtered = menuData.filter(item => {
     const matchCat = activeCategory === "Semua" || item.categories?.name === activeCategory;
@@ -331,6 +346,7 @@ function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, showT
               </div>
             </div>
 
+            {/* FIX: Sekarang navigasi ke payment screen, bukan langsung checkout */}
             <button
               onClick={() => onCheckout(cartArr, subtotal)}
               style={{
@@ -384,12 +400,17 @@ function SuccessScreen({ orderCode, onBackToMenu }) {
 
 // ===================== APP =====================
 export default function App() {
-  const [screen, setScreen]     = useState("splash");
-  const [cart, setCart]         = useState({});
-  const [menuData, setMenuData] = useState([]);
-  const [toast, setToast]       = useState({ msg: "", visible: false });
-  const [orderCode, setOrderCode] = useState("");
+  const [screen, setScreen]         = useState("splash");
+  const [cart, setCart]             = useState({});
+  const [menuData, setMenuData]     = useState([]);
+  const [toast, setToast]           = useState({ msg: "", visible: false });
+  const [orderCode, setOrderCode]   = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // FIX: State untuk menyimpan data sebelum masuk payment/QRIS screen
+  const [pendingCartArr, setPendingCartArr] = useState([]);
+  const [pendingSubtotal, setPendingSubtotal] = useState(0);
+
   const toastTimer = useRef(null);
 
   // Fetch menu global (dipakai CartScreen untuk nama item)
@@ -418,8 +439,15 @@ export default function App() {
     });
   }, []);
 
-  // ===================== CHECKOUT KE SUPABASE =====================
-  const handleCheckout = async (cartArr, subtotal) => {
+  // FIX: Cart → Payment screen (simpan dulu, jangan langsung submit)
+  const handleGoToPayment = useCallback((cartArr, subtotal) => {
+    setPendingCartArr(cartArr);
+    setPendingSubtotal(subtotal);
+    setScreen("payment");
+  }, []);
+
+  // ===================== SUBMIT ORDER KE SUPABASE =====================
+  const handleCheckout = useCallback(async () => {
     setSubmitting(true);
     try {
       // 1. Buat order
@@ -427,7 +455,7 @@ export default function App() {
         .from("orders")
         .insert({
           table_number: 7,
-          total_price: subtotal,
+          total_price: pendingSubtotal,
           status: "pending",
           payment_status: "unpaid",
         })
@@ -437,7 +465,7 @@ export default function App() {
       if (orderErr) throw orderErr;
 
       // 2. Insert order_items
-      const items = cartArr.map(item => ({
+      const items = pendingCartArr.map(item => ({
         order_id: order.id,
         menu_id: item.id,
         quantity: item.qty,
@@ -451,6 +479,8 @@ export default function App() {
       const kode = "#HS-" + order.id.slice(0, 8).toUpperCase();
       setOrderCode(kode);
       setCart({});
+      setPendingCartArr([]);
+      setPendingSubtotal(0);
       setScreen("success");
     } catch (err) {
       console.error(err);
@@ -458,7 +488,18 @@ export default function App() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [pendingCartArr, pendingSubtotal, showToast]);
+
+  // Handler dari PaymentScreen: pilih metode lalu lanjut
+  const handlePayMethodChosen = useCallback(({ method }) => {
+    if (method === "online") {
+      // QRIS → tampilkan QRIS screen
+      setScreen("qris");
+    } else {
+      // Bayar di kasir → langsung submit order
+      handleCheckout();
+    }
+  }, [handleCheckout]);
 
   return (
     <div style={{
@@ -499,8 +540,26 @@ export default function App() {
             onAdd={addToCart}
             onRemove={removeFromCart}
             onBack={() => setScreen("menu")}
-            onCheckout={handleCheckout}
+            onCheckout={handleGoToPayment}
             showToast={showToast}
+          />
+        )}
+
+        {/* FIX: Payment screen sekarang tampil */}
+        {screen === "payment" && (
+          <PaymentScreen
+            subtotal={pendingSubtotal}
+            onBack={() => setScreen("cart")}
+            onPay={handlePayMethodChosen}
+          />
+        )}
+
+        {/* FIX: QRIS screen sekarang tampil */}
+        {screen === "qris" && (
+          <QRISScreen
+            subtotal={pendingSubtotal}
+            onBack={() => setScreen("payment")}
+            onCheckStatus={handleCheckout}
           />
         )}
 

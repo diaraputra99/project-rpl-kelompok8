@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./QRISScreen.css";
+import "../styles/QRISscreen.css";
 
 // ===================== CONSTANTS =====================
 const MERCHANT = {

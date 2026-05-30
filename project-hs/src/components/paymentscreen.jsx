@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./PaymentScreen.css";
+import "../styles/paymentscreen.css";
 
 // ===================== SUB-COMPONENTS =====================
 
