@@ -10,12 +10,12 @@ const formatRp = (n) => "Rp" + Number(n).toLocaleString("id-ID");
 function Toast({ message, visible }) {
   return (
     <div style={{
-      position: "absolute", bottom: 100, left: "50%",
+      position: "fixed", bottom: 24, left: "50%",
       transform: "translateX(-50%)",
       background: "#1A1208", color: "#fff",
       padding: "10px 22px", borderRadius: 20,
       fontSize: 13, fontWeight: 600,
-      whiteSpace: "nowrap", zIndex: 999,
+      whiteSpace: "nowrap", zIndex: 9999,
       opacity: visible ? 1 : 0,
       transition: "opacity 0.22s",
       pointerEvents: "none",
@@ -37,24 +37,16 @@ function SplashScreen({ onStart }) {
       alignItems: "center", justifyContent: "center",
       background: "linear-gradient(160deg, #1A0F04 0%, #3D1F0A 50%, #6B3F1E 100%)",
       position: "relative", overflow: "hidden",
+      minHeight: "100dvh",
     }}>
-      <div style={{
-        position: "absolute", width: 320, height: 320,
-        borderRadius: "50%", border: "1px solid rgba(232,160,32,0.12)",
-        top: "50%", left: "50%", transform: "translate(-50%,-50%)",
-        pointerEvents: "none",
-      }} />
-      <div style={{
-        position: "absolute", width: 220, height: 220,
-        borderRadius: "50%", border: "1px solid rgba(232,160,32,0.18)",
-        top: "50%", left: "50%", transform: "translate(-50%,-50%)",
-        pointerEvents: "none",
-      }} />
+      <div style={{ position: "absolute", width: "min(320px, 80vw)", height: "min(320px, 80vw)", borderRadius: "50%", border: "1px solid rgba(232,160,32,0.12)", top: "50%", left: "50%", transform: "translate(-50%,-50%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: "min(220px, 55vw)", height: "min(220px, 55vw)", borderRadius: "50%", border: "1px solid rgba(232,160,32,0.18)", top: "50%", left: "50%", transform: "translate(-50%,-50%)", pointerEvents: "none" }} />
 
       <div style={{
         display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
         opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)",
         transition: "all 0.7s cubic-bezier(0.25,0.46,0.45,0.94)",
+        padding: "0 24px",
       }}>
         <div style={{
           width: 110, height: 110,
@@ -65,15 +57,10 @@ function SplashScreen({ onStart }) {
           <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 38, color: "#E8A020", fontWeight: 700 }}>HS</span>
         </div>
 
-        <h1 style={{
-          fontFamily: "'Playfair Display', serif",
-          color: "#fff", fontSize: 28,
-          letterSpacing: 6, textAlign: "center", lineHeight: 1.3, margin: 0,
-        }}>WARKOP<br />· HS ·</h1>
-
-        <p style={{ color: "#E8A020", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", margin: 0 }}>
-          Coffee &amp; Dining
-        </p>
+        <h1 style={{ fontFamily: "'Playfair Display', serif", color: "#fff", fontSize: "clamp(22px, 5vw, 28px)", letterSpacing: 6, textAlign: "center", lineHeight: 1.3, margin: 0 }}>
+          WARKOP<br />· HS ·
+        </h1>
+        <p style={{ color: "#E8A020", fontSize: 11, letterSpacing: 4, textTransform: "uppercase", margin: 0 }}>Coffee &amp; Dining</p>
 
         <button
           onClick={onStart}
@@ -103,52 +90,35 @@ function MenuCard({ item, qty, onAdd, onRemove }) {
       border: "1px solid #E8DCC8", boxShadow: "0 2px 12px rgba(139,101,8,0.09)",
       transition: "transform 0.15s", cursor: "pointer",
     }}
-      onMouseEnter={e => e.currentTarget.style.transform = "scale(0.98)"}
-      onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+      onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
+      onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
     >
       <div style={{
-        width: "100%", height: 110,
+        width: "100%", paddingTop: "65%", position: "relative",
         background: "linear-gradient(135deg, #f5e6c8, #e8d4a0)",
-        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38,
       }}>
         {item.image_url
-          ? <img src={item.image_url} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          : "🍽️"}
+          ? <img src={item.image_url} alt={item.name} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+          : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32 }}>🍽️</div>
+        }
       </div>
-
       <div style={{ padding: "8px 10px 10px" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#1A1208", marginBottom: 3, lineHeight: 1.3 }}>
-          {item.name}
-        </div>
-        <div style={{ fontSize: 12, color: "#B8860B", fontWeight: 700, marginBottom: 6 }}>
-          {formatRp(item.price)}
-        </div>
-
+        <div style={{ fontSize: "clamp(11px, 1.5vw, 13px)", fontWeight: 700, color: "#1A1208", marginBottom: 3, lineHeight: 1.3 }}>{item.name}</div>
+        <div style={{ fontSize: "clamp(11px, 1.5vw, 12px)", color: "#B8860B", fontWeight: 700, marginBottom: 6 }}>{formatRp(item.price)}</div>
         {!item.is_available ? (
           <span style={{ fontSize: 10, color: "#999" }}>Tidak tersedia</span>
         ) : qty === 0 ? (
-          <button
-            onClick={() => onAdd(item.id)}
-            style={{
-              width: "100%", border: "1.5px solid #B8860B", borderRadius: 8,
-              background: "none", color: "#B8860B", fontSize: 11,
-              fontWeight: 700, cursor: "pointer", padding: "5px 0",
-              fontFamily: "'Nunito', sans-serif",
-            }}
-          >+ Tambah</button>
+          <button onClick={() => onAdd(item.id)} style={{
+            width: "100%", border: "1.5px solid #B8860B", borderRadius: 8,
+            background: "none", color: "#B8860B", fontSize: 11,
+            fontWeight: 700, cursor: "pointer", padding: "5px 0",
+            fontFamily: "'Nunito', sans-serif",
+          }}>+ Tambah</button>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "space-between" }}>
-            <button onClick={() => onRemove(item.id)} style={{
-              width: 26, height: 26, borderRadius: 7, border: "1.5px solid #E8DCC8",
-              background: "none", fontSize: 16, fontWeight: 700, cursor: "pointer",
-              color: "#1A1208", display: "flex", alignItems: "center", justifyContent: "center",
-            }}>−</button>
+            <button onClick={() => onRemove(item.id)} style={{ width: 28, height: 28, borderRadius: 7, border: "1.5px solid #E8DCC8", background: "none", fontSize: 16, fontWeight: 700, cursor: "pointer", color: "#1A1208", display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
             <span style={{ fontSize: 14, fontWeight: 800 }}>{qty}</span>
-            <button onClick={() => onAdd(item.id)} style={{
-              width: 26, height: 26, borderRadius: 7, border: "1.5px solid #B8860B",
-              background: "#B8860B", fontSize: 16, fontWeight: 700, cursor: "pointer",
-              color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
-            }}>+</button>
+            <button onClick={() => onAdd(item.id)} style={{ width: 28, height: 28, borderRadius: 7, border: "1.5px solid #B8860B", background: "#B8860B", fontSize: 16, fontWeight: 700, cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
           </div>
         )}
       </div>
@@ -157,7 +127,7 @@ function MenuCard({ item, qty, onAdd, onRemove }) {
 }
 
 // ===================== MENU SCREEN =====================
-function MenuScreen({ cart, onAdd, onRemove, onCartClick, showToast }) {
+function MenuScreen({ cart, onAdd, onRemove, onCartClick }) {
   const [menuData, setMenuData]             = useState([]);
   const [categories, setCategories]         = useState([]);
   const [activeCategory, setActiveCategory] = useState("Semua");
@@ -168,21 +138,12 @@ function MenuScreen({ cart, onAdd, onRemove, onCartClick, showToast }) {
     let isMounted = true;
     async function fetchData() {
       setLoading(true);
-      const { data: cats } = await supabase.from("categories").select("*").order("name");
-      const { data: menus } = await supabase
-        .from("menus")
-        .select("*, categories(name)")
-        .order("name");
+      const { data: cats }  = await supabase.from("categories").select("*").order("name");
+      const { data: menus } = await supabase.from("menus").select("*, categories(name)").order("name");
       if (!isMounted) return;
-      // FIX: Dedup categories berdasarkan name
       if (cats) {
         const seen = new Set();
-        const uniqueCats = cats.filter(c => {
-          if (seen.has(c.name)) return false;
-          seen.add(c.name);
-          return true;
-        });
-        setCategories(uniqueCats);
+        setCategories(cats.filter(c => { if (seen.has(c.name)) return false; seen.add(c.name); return true; }));
       }
       if (menus) setMenuData(menus);
       setLoading(false);
@@ -191,66 +152,51 @@ function MenuScreen({ cart, onAdd, onRemove, onCartClick, showToast }) {
     return () => { isMounted = false; };
   }, []);
 
-  // FIX: Pakai Set untuk jaga-jaga duplikat nama kategori
   const allCategories = ["Semua", ...new Set(categories.map(c => c.name))];
-
   const filtered = menuData.filter(item => {
     const matchCat = activeCategory === "Semua" || item.categories?.name === activeCategory;
     const matchQ   = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCat && matchQ;
   });
-
   const totalQty = Object.values(cart).reduce((a, b) => a + b, 0);
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#FAF3EC" }}>
       {/* Header */}
       <div style={{ background: "#fff", padding: "12px 16px 0", borderBottom: "1px solid #E8DCC8", flexShrink: 0 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <span style={{ background: "#F5E9C9", border: "1px solid #E8DCC8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#8B6508" }}>
-            🪑 Meja 7
-          </span>
+          <span style={{ background: "#F5E9C9", border: "1px solid #E8DCC8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#8B6508" }}>🪑 Meja 7</span>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#1A1208" }}>Warkop HS Balio</span>
         </div>
-
-        {/* Search */}
         <div style={{ display: "flex", alignItems: "center", background: "#FAF3EC", border: "1px solid #E8DCC8", borderRadius: 10, padding: "8px 12px", marginBottom: 10, gap: 8 }}>
           <span>🔍</span>
           <input
-            type="text"
-            placeholder="Mau makan apa hari ini?"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            type="text" placeholder="Mau makan apa hari ini?"
+            value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
             style={{ border: "none", background: "none", flex: 1, fontSize: 13, outline: "none", fontFamily: "'Nunito', sans-serif" }}
           />
         </div>
-
-        {/* Category tabs */}
         <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 10, scrollbarWidth: "none" }}>
           {allCategories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              style={{
-                flexShrink: 0, padding: "5px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700,
-                cursor: "pointer", border: "none", transition: "all 0.15s",
-                background: activeCategory === cat ? "#B8860B" : "#FAF3EC",
-                color: activeCategory === cat ? "#fff" : "#5A4A30",
-                fontFamily: "'Nunito', sans-serif",
-              }}
-            >{cat}</button>
+            <button key={cat} onClick={() => setActiveCategory(cat)} style={{
+              flexShrink: 0, padding: "5px 14px", borderRadius: 20, fontSize: 12, fontWeight: 700,
+              cursor: "pointer", border: "none", transition: "all 0.15s",
+              background: activeCategory === cat ? "#B8860B" : "#FAF3EC",
+              color: activeCategory === cat ? "#fff" : "#5A4A30",
+              fontFamily: "'Nunito', sans-serif",
+            }}>{cat}</button>
           ))}
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid — kolom menyesuaikan lebar layar */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px", scrollbarWidth: "none" }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: 40, color: "#9A8A70", fontSize: 13 }}>Memuat menu...</div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: 40, color: "#9A8A70", fontSize: 13 }}>Tidak ada menu ditemukan</div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12 }}>
             {filtered.map(item => (
               <MenuCard key={item.id} item={item} qty={cart[item.id] || 0} onAdd={onAdd} onRemove={onRemove} />
             ))}
@@ -258,47 +204,34 @@ function MenuScreen({ cart, onAdd, onRemove, onCartClick, showToast }) {
         )}
       </div>
 
-      {/* Cart FAB */}
       {totalQty > 0 && (
-        <button
-          onClick={onCartClick}
-          style={{
-            position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
-            background: "#B8860B", color: "#fff", border: "none", borderRadius: 50,
-            padding: "12px 24px", fontSize: 14, fontWeight: 800, cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap",
+        <div style={{ padding: "12px 16px", background: "#FAF3EC", flexShrink: 0 }}>
+          <button onClick={onCartClick} style={{
+            width: "100%", background: "#B8860B", color: "#fff", border: "none", borderRadius: 12,
+            padding: "13px 20px", fontSize: 15, fontWeight: 800, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
             boxShadow: "0 4px 20px rgba(184,134,11,0.4)", fontFamily: "'Nunito', sans-serif",
-            zIndex: 10,
-          }}
-        >
-          🛒 Lihat Keranjang
-          <span style={{ background: "rgba(255,255,255,0.25)", borderRadius: 20, padding: "2px 10px", fontSize: 13 }}>
-            {totalQty}
-          </span>
-        </button>
+          }}>
+            <span>🛒 Lihat Keranjang</span>
+            <span style={{ background: "rgba(255,255,255,0.25)", borderRadius: 20, padding: "2px 12px", fontSize: 13 }}>{totalQty}</span>
+          </button>
+        </div>
       )}
     </div>
   );
 }
 
 // ===================== CART SCREEN =====================
-function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, showToast }) {
-  const cartArr = Object.entries(cart)
-    .map(([id, qty]) => ({ ...menuData.find(m => m.id === Number(id)), qty }))
-    .filter(Boolean);
+function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout }) {
+  const cartArr  = Object.entries(cart).map(([id, qty]) => ({ ...menuData.find(m => m.id === Number(id)), qty })).filter(Boolean);
   const subtotal = cartArr.reduce((s, i) => s + Number(i.price) * i.qty, 0);
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FAF3EC" }}>
-      <div style={{
-        background: "#fff", padding: "12px 16px",
-        display: "flex", alignItems: "center", gap: 10,
-        borderBottom: "1px solid #E8DCC8", flexShrink: 0,
-      }}>
+      <div style={{ background: "#fff", padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #E8DCC8", flexShrink: 0 }}>
         <button onClick={onBack} style={{ width: 32, height: 32, borderRadius: "50%", border: "none", background: "#FAF3EC", cursor: "pointer", fontSize: 18 }}>←</button>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1A1208", flex: 1, margin: 0 }}>Keranjang</h2>
       </div>
-
       <div style={{ flex: 1, overflowY: "auto", paddingBottom: 20, scrollbarWidth: "none" }}>
         <div style={{ height: 10 }} />
         {cartArr.length === 0 ? (
@@ -309,17 +242,8 @@ function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, showT
         ) : (
           <>
             {cartArr.map(item => (
-              <div key={item.id} style={{
-                background: "#fff", margin: "0 16px 10px", borderRadius: 14,
-                border: "1px solid #E8DCC8", padding: "12px 14px",
-                display: "flex", alignItems: "center", gap: 12,
-              }}>
-                <div style={{
-                  width: 56, height: 56, borderRadius: 10,
-                  background: "linear-gradient(135deg,#f5e6c8,#e8d4a0)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 24, flexShrink: 0, overflow: "hidden",
-                }}>
+              <div key={item.id} style={{ background: "#fff", margin: "0 16px 10px", borderRadius: 14, border: "1px solid #E8DCC8", padding: "12px 14px", display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 56, height: 56, borderRadius: 10, background: "linear-gradient(135deg,#f5e6c8,#e8d4a0)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0, overflow: "hidden" }}>
                   {item.image_url ? <img src={item.image_url} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "🍽️"}
                 </div>
                 <div style={{ flex: 1 }}>
@@ -334,7 +258,6 @@ function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, showT
                 <div style={{ fontSize: 13, fontWeight: 800, color: "#1A1208" }}>{formatRp(Number(item.price) * item.qty)}</div>
               </div>
             ))}
-
             <div style={{ background: "#fff", margin: "0 16px", borderRadius: 14, border: "1px solid #E8DCC8", padding: "14px 16px" }}>
               {[["Subtotal", formatRp(subtotal)], ["Biaya Layanan", "Rp0"]].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: 13, color: "#5A4A30" }}>
@@ -345,17 +268,13 @@ function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, showT
                 <span>Total</span><span>{formatRp(subtotal)}</span>
               </div>
             </div>
-
-            {/* FIX: Sekarang navigasi ke payment screen, bukan langsung checkout */}
-            <button
-              onClick={() => onCheckout(cartArr, subtotal)}
-              style={{
-                margin: "14px 16px 0", width: "calc(100% - 32px)",
-                background: "#B8860B", color: "#fff", border: "none", borderRadius: 12,
+            <div style={{ padding: "14px 16px 0" }}>
+              <button onClick={() => onCheckout(cartArr, subtotal)} style={{
+                width: "100%", background: "#B8860B", color: "#fff", border: "none", borderRadius: 12,
                 padding: 15, fontSize: 15, fontWeight: 800, cursor: "pointer",
                 fontFamily: "'Nunito', sans-serif", boxShadow: "0 4px 16px rgba(184,134,11,0.3)",
-              }}
-            >Lanjut Pembayaran →</button>
+              }}>Lanjut Pembayaran →</button>
+            </div>
           </>
         )}
       </div>
@@ -364,7 +283,7 @@ function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, showT
 }
 
 // ===================== SUCCESS SCREEN =====================
-function SuccessScreen({ orderCode, onBackToMenu }) {
+function SuccessScreen({ orderCode, customerEmail, onBackToMenu }) {
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FAF3EC" }}>
       <div style={{ background: "#fff", padding: "12px 16px", borderBottom: "1px solid #E8DCC8" }}>
@@ -382,17 +301,19 @@ function SuccessScreen({ orderCode, onBackToMenu }) {
         <div style={{ background: "#F5E9C9", borderRadius: 12, padding: "14px 20px", fontSize: 13, color: "#5A4A30", maxWidth: 280 }}>
           🪑 Meja <strong>7</strong> &nbsp;|&nbsp; 🍽️ Makan di tempat
         </div>
+        {customerEmail && (
+          <div style={{ fontSize: 12, color: "#9A8A70", display: "flex", alignItems: "center", gap: 6 }}>
+            ✉️ Struk dikirim ke <strong>{customerEmail}</strong>
+          </div>
+        )}
       </div>
       <div style={{ padding: "0 16px 24px" }}>
-        <button
-          onClick={onBackToMenu}
-          style={{
-            width: "100%", background: "#B8860B", color: "#fff",
-            border: "none", borderRadius: 12, padding: 15,
-            fontSize: 15, fontWeight: 800, cursor: "pointer",
-            fontFamily: "'Nunito', sans-serif", boxShadow: "0 4px 16px rgba(184,134,11,0.3)",
-          }}
-        >Kembali ke Menu</button>
+        <button onClick={onBackToMenu} style={{
+          width: "100%", background: "#B8860B", color: "#fff",
+          border: "none", borderRadius: 12, padding: 15,
+          fontSize: 15, fontWeight: 800, cursor: "pointer",
+          fontFamily: "'Nunito', sans-serif", boxShadow: "0 4px 16px rgba(184,134,11,0.3)",
+        }}>Kembali ke Menu</button>
       </div>
     </div>
   );
@@ -400,20 +321,17 @@ function SuccessScreen({ orderCode, onBackToMenu }) {
 
 // ===================== APP =====================
 export default function App() {
-  const [screen, setScreen]         = useState("splash");
-  const [cart, setCart]             = useState({});
-  const [menuData, setMenuData]     = useState([]);
-  const [toast, setToast]           = useState({ msg: "", visible: false });
-  const [orderCode, setOrderCode]   = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  // FIX: State untuk menyimpan data sebelum masuk payment/QRIS screen
-  const [pendingCartArr, setPendingCartArr] = useState([]);
-  const [pendingSubtotal, setPendingSubtotal] = useState(0);
-
+  const [screen, setScreen]           = useState("splash");
+  const [cart, setCart]               = useState({});
+  const [menuData, setMenuData]       = useState([]);
+  const [toast, setToast]             = useState({ msg: "", visible: false });
+  const [orderCode, setOrderCode]     = useState("");
+  const [submitting, setSubmitting]   = useState(false);
+  const [pendingCartArr, setPendingCartArr]     = useState([]);
+  const [pendingSubtotal, setPendingSubtotal]   = useState(0);
+  const [customerInfo, setCustomerInfo]         = useState({});
   const toastTimer = useRef(null);
 
-  // Fetch menu global (dipakai CartScreen untuk nama item)
   useEffect(() => {
     supabase.from("menus").select("*, categories(name)").then(({ data }) => {
       if (data) setMenuData(data);
@@ -426,27 +344,20 @@ export default function App() {
     toastTimer.current = setTimeout(() => setToast(t => ({ ...t, visible: false })), 2200);
   }, []);
 
-  const addToCart = useCallback((id) => {
-    setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-  }, []);
+  const addToCart    = useCallback((id) => setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 })), []);
+  const removeFromCart = useCallback((id) => setCart(prev => {
+    const next = { ...prev };
+    if (next[id] > 1) next[id]--; else delete next[id];
+    return next;
+  }), []);
 
-  const removeFromCart = useCallback((id) => {
-    setCart(prev => {
-      const next = { ...prev };
-      if (next[id] > 1) next[id]--;
-      else delete next[id];
-      return next;
-    });
-  }, []);
-
-  // FIX: Cart → Payment screen (simpan dulu, jangan langsung submit)
   const handleGoToPayment = useCallback((cartArr, subtotal) => {
     setPendingCartArr(cartArr);
     setPendingSubtotal(subtotal);
     setScreen("payment");
   }, []);
 
-  // ===================== SUBMIT ORDER KE SUPABASE =====================
+  // ===================== SUBMIT ORDER + KIRIM EMAIL =====================
   const handleCheckout = useCallback(async () => {
     setSubmitting(true);
     try {
@@ -458,10 +369,12 @@ export default function App() {
           total_price: pendingSubtotal,
           status: "pending",
           payment_status: "unpaid",
+          customer_name: customerInfo.nama || null,
+          customer_phone: customerInfo.noHp || null,
+          customer_email: customerInfo.email || null,
         })
         .select()
         .single();
-
       if (orderErr) throw orderErr;
 
       // 2. Insert order_items
@@ -471,11 +384,33 @@ export default function App() {
         quantity: item.qty,
         subtotal: Number(item.price) * item.qty,
       }));
-
       const { error: itemsErr } = await supabase.from("order_items").insert(items);
       if (itemsErr) throw itemsErr;
 
-      // 3. Sukses
+      // 3. Kirim struk email via Supabase Edge Function (jika ada email)
+      if (customerInfo.email) {
+        try {
+          await supabase.functions.invoke("send-receipt", {
+            body: {
+              to: customerInfo.email,
+              customerName: customerInfo.nama || "Pelanggan",
+              orderCode: "#HS-" + order.id.slice(0, 8).toUpperCase(),
+              tableNumber: 7,
+              items: pendingCartArr.map(i => ({
+                name: i.name,
+                qty: i.qty,
+                price: Number(i.price),
+                subtotal: Number(i.price) * i.qty,
+              })),
+              total: pendingSubtotal,
+            },
+          });
+        } catch (emailErr) {
+          // Email gagal tidak batalkan order
+          console.warn("Email struk gagal dikirim:", emailErr);
+        }
+      }
+
       const kode = "#HS-" + order.id.slice(0, 8).toUpperCase();
       setOrderCode(kode);
       setCart({});
@@ -488,40 +423,35 @@ export default function App() {
     } finally {
       setSubmitting(false);
     }
-  }, [pendingCartArr, pendingSubtotal, showToast]);
+  }, [pendingCartArr, pendingSubtotal, customerInfo, showToast]);
 
-  // Handler dari PaymentScreen: pilih metode lalu lanjut
-  const handlePayMethodChosen = useCallback(({ method }) => {
+  const handlePayMethodChosen = useCallback(({ method, nama, noHp, email }) => {
+    setCustomerInfo({ nama, noHp, email });
     if (method === "online") {
-      // QRIS → tampilkan QRIS screen
       setScreen("qris");
     } else {
-      // Bayar di kasir → langsung submit order
       handleCheckout();
     }
   }, [handleCheckout]);
 
   return (
-    <div style={{
-      background: "#E8DDD0", display: "flex", justifyContent: "center",
-      alignItems: "center", minHeight: "100vh", padding: 20,
-      fontFamily: "'Nunito', sans-serif",
-    }}>
+    <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; }
+        body { background: #E8DDD0; font-family: 'Nunito', sans-serif; }
         ::-webkit-scrollbar { width: 0; height: 0; }
+        #root {
+          min-height: 100dvh;
+          display: flex;
+          flex-direction: column;
+        }
       `}</style>
 
-      <div style={{
-        width: 390, height: 844, background: "#FAF3EC",
-        borderRadius: 44, overflow: "hidden", position: "relative",
-        boxShadow: "0 30px 80px rgba(0,0,0,0.35)",
-        display: "flex", flexDirection: "column",
-      }}>
-        {screen === "splash" && (
-          <SplashScreen onStart={() => setScreen("menu")} />
-        )}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
+
+        {screen === "splash" && <SplashScreen onStart={() => setScreen("menu")} />}
 
         {screen === "menu" && (
           <MenuScreen
@@ -529,7 +459,6 @@ export default function App() {
             onAdd={addToCart}
             onRemove={removeFromCart}
             onCartClick={() => setScreen("cart")}
-            showToast={showToast}
           />
         )}
 
@@ -541,11 +470,9 @@ export default function App() {
             onRemove={removeFromCart}
             onBack={() => setScreen("menu")}
             onCheckout={handleGoToPayment}
-            showToast={showToast}
           />
         )}
 
-        {/* FIX: Payment screen sekarang tampil */}
         {screen === "payment" && (
           <PaymentScreen
             subtotal={pendingSubtotal}
@@ -554,7 +481,6 @@ export default function App() {
           />
         )}
 
-        {/* FIX: QRIS screen sekarang tampil */}
         {screen === "qris" && (
           <QRISScreen
             subtotal={pendingSubtotal}
@@ -566,15 +492,15 @@ export default function App() {
         {screen === "success" && (
           <SuccessScreen
             orderCode={orderCode}
-            onBackToMenu={() => setScreen("menu")}
+            customerEmail={customerInfo.email}
+            onBackToMenu={() => { setCustomerInfo({}); setScreen("menu"); }}
           />
         )}
 
         {submitting && (
           <div style={{
-            position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            zIndex: 100,
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100,
           }}>
             <div style={{ background: "#fff", borderRadius: 16, padding: "20px 32px", fontSize: 14, fontWeight: 700, color: "#1A1208" }}>
               Memproses pesanan...
@@ -584,6 +510,6 @@ export default function App() {
 
         <Toast message={toast.msg} visible={toast.visible} />
       </div>
-    </div>
+    </>
   );
 }
