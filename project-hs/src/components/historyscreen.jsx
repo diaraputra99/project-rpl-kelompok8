@@ -1,23 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./HistoryScreen.css";
-
-// ===================== DATA DUMMY =====================
-const DUMMY_ORDERS = [
-  {
-    id: "SRYNPHT12438ND",
-    resto: "Warkop HS Balio",
-    total: 54000,
-    items: [
-      { name: "Kopi Susu",    qty: 1, price: 8000  },
-      { name: "Nasi Goreng",  qty: 1, price: 13000 },
-      { name: "Mie Rebus",    qty: 1, price: 10000 },
-    ],
-    type: "Makan di tempat",
-    date: "22 Apr 2026, 20:34",
-  },
-];
-
-// ===================== SUB-COMPONENTS =====================
+import { supabase } from "../supabase";
 
 function EmptyState({ icon, label }) {
   return (
@@ -28,109 +11,95 @@ function EmptyState({ icon, label }) {
   );
 }
 
-function OrderCard({ order, onClick, onReorder }) {
-  const itemCount = order.items.reduce((sum, i) => sum + i.qty, 0);
-  const itemNames = order.items.map((i) => i.name).join(", ");
+function OrderCard({ order, onClick }) {
+  const itemCount = order.order_items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
+  const itemNames = order.order_items?.map(i => i.menus?.name).filter(Boolean).join(", ") || "";
+  const tanggal   = new Date(order.created_at).toLocaleString("id-ID", {
+    day: "numeric", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
 
   return (
     <div className="order-card" onClick={onClick}>
-      <div className="order-resto">{order.resto}</div>
+      <div className="order-resto">Warkop HS Balio</div>
       <div className="order-total">
-        Rp{order.total.toLocaleString("id")}{" "}
+        Rp{Number(order.total_price).toLocaleString("id")}{" "}
         <span className="order-item-count">({itemCount} item)</span>
       </div>
       <div className="order-items">{itemNames}</div>
-      <div className="order-code">#{order.id}</div>
+      <div className="order-code">#{order.id.slice(0, 8).toUpperCase()}</div>
       <div className="order-meta">
         <div>
-          <div className="order-type">{order.type}</div>
-          <div className="order-date">{order.date}</div>
+          <div className="order-type">Meja {order.table_number} • Makan di tempat</div>
+          <div className="order-date">{tanggal}</div>
         </div>
-        <button
-          className="pesan-lagi-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            onReorder(order);
-          }}
-        >
-          Pesan Lagi
-        </button>
+        <span style={{
+          fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20,
+          background: order.status === "selesai" ? "#d4edda" : order.status === "pending" ? "#fff3cd" : "#f8d7da",
+          color: order.status === "selesai" ? "#155724" : order.status === "pending" ? "#856404" : "#721c24",
+        }}>
+          {order.status === "selesai" ? "✓ Selesai" : order.status === "pending" ? "⏳ Diproses" : order.status}
+        </span>
       </div>
     </div>
   );
 }
-
-// ===================== MAIN SCREEN =====================
 
 export default function HistoryScreen({
   onBack,
   onGoToMenu,
   onGoToStore,
   onGoToProfile,
-  onGoToOrderDetail,
-  onReorder,
-  onShowToast,
 }) {
   const [activeTab, setActiveTab] = useState("pesan");
+  const [orders, setOrders]       = useState([]);
+  const [loading, setLoading]     = useState(true);
+
+  useEffect(() => {
+    async function fetchOrders() {
+      setLoading(true);
+      const { data } = await supabase
+        .from("orders")
+        .select("*, order_items(quantity, menus(name))")
+        .order("created_at", { ascending: false })
+        .limit(30);
+      if (data) setOrders(data);
+      setLoading(false);
+    }
+    fetchOrders();
+  }, []);
 
   return (
     <div className="history-screen">
-
-
-      {/* TOP BAR */}
       <div className="topbar">
         <button className="back-btn" onClick={onBack}>←</button>
         <h2>Riwayat Pesanan</h2>
       </div>
 
-      {/* TAB SWITCHER */}
       <div className="tab-switcher">
-        <button
-          className={`tab-btn ${activeTab === "pesan" ? "active" : ""}`}
-          onClick={() => setActiveTab("pesan")}
-        >
-          Pesan
-        </button>
-        <button
-          className={`tab-btn ${activeTab === "reservasi" ? "active" : ""}`}
-          onClick={() => setActiveTab("reservasi")}
-        >
-          Reservasi
-        </button>
+        <button className={`tab-btn ${activeTab === "pesan" ? "active" : ""}`} onClick={() => setActiveTab("pesan")}>Pesan</button>
+        <button className={`tab-btn ${activeTab === "reservasi" ? "active" : ""}`} onClick={() => setActiveTab("reservasi")}>Reservasi</button>
       </div>
 
-      {/* CONTENT */}
       <div className="scroll-content">
-
-        {/* Tab: Pesan */}
         {activeTab === "pesan" && (
           <>
-            {DUMMY_ORDERS.length === 0 ? (
+            {loading ? (
+              <div style={{ textAlign: "center", padding: 40, fontSize: 13, color: "#9A8A70" }}>Memuat riwayat...</div>
+            ) : orders.length === 0 ? (
               <EmptyState icon="🛒" label="Anda belum memesan apa pun" />
             ) : (
-              DUMMY_ORDERS.map((order) => (
-                <OrderCard
-                  key={order.id}
-                  order={order}
-                  onClick={() => onGoToOrderDetail(order)}
-                  onReorder={(o) => {
-                    onReorder?.(o);
-                    onShowToast?.("Item ditambahkan ke keranjang!");
-                  }}
-                />
+              orders.map(order => (
+                <OrderCard key={order.id} order={order} onClick={() => {}} />
               ))
             )}
           </>
         )}
-
-        {/* Tab: Reservasi */}
         {activeTab === "reservasi" && (
-          <EmptyState icon="📅" label="Anda belum memesan apa pun" />
+          <EmptyState icon="📅" label="Anda belum memiliki reservasi" />
         )}
-
       </div>
 
-      {/* BOTTOM NAV */}
       <div className="bottom-nav">
         <button className="nav-item" onClick={onGoToMenu}>
           <span className="nav-icon">🍽️</span>Menu
