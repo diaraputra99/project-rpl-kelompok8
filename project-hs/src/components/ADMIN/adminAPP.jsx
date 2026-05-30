@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import "./App.css";      
+import "./globals.css";
 import { supabase } from "../../supabase";
 
 import DashboardScreen from "./dashboardscreen";
