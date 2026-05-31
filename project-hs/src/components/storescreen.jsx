@@ -1,5 +1,5 @@
 import React from "react";
-import "./StoreScreen.css";
+import "../styles/storescreen.css";
 
 // ===================== DATA =====================
 const STORE = {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./HistoryScreen.css";
+import "../styles/historyscreen.css";
 import { supabase } from "../supabase";
 
 function EmptyState({ icon, label }) {

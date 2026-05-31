@@ -1,5 +1,5 @@
 import React from "react";
-import "./ProfileScreen.css";
+import "../styles/profilescreen.css";
 
 // ===================== DATA =====================
 const APP_VERSION = "1.0.0";
