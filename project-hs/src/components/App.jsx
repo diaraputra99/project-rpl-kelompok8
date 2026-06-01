@@ -180,8 +180,15 @@ function SplashScreen({ onStart }) {
 
 // ===================== MENU CARD =====================
 function MenuCard({ item, qty, onAdd, onRemove }) {
+  const inCart = qty > 0;
   return (
-    <div style={{ background: "#fff", borderRadius: 14, overflow: "hidden", border: "1px solid #E8DCC8", boxShadow: "0 2px 12px rgba(139,101,8,0.09)", transition: "transform 0.15s", cursor: "pointer" }}
+    <div style={{
+      background: "#fff", borderRadius: 14, overflow: "hidden",
+      border: inCart ? "2px solid #B8860B" : "1px solid #E8DCC8",
+      boxShadow: inCart ? "0 4px 16px rgba(184,134,11,0.22)" : "0 2px 12px rgba(139,101,8,0.09)",
+      transition: "border 0.18s, box-shadow 0.18s, transform 0.15s",
+      cursor: "pointer",
+    }}
       onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
       onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
     >
@@ -190,6 +197,14 @@ function MenuCard({ item, qty, onAdd, onRemove }) {
           ? <img src={item.image_url} alt={item.name} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
           : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32 }}>🍽️</div>
         }
+        {inCart && (
+          <div style={{
+            position: "absolute", top: 7, left: 7,
+            background: "#B8860B", color: "#fff", borderRadius: 20,
+            padding: "2px 8px", fontSize: 11, fontWeight: 800,
+            boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+          }}>{qty}</div>
+        )}
       </div>
       <div style={{ padding: "8px 10px 10px" }}>
         <div style={{ fontSize: "clamp(11px,1.5vw,13px)", fontWeight: 700, color: "#1A1208", marginBottom: 3, lineHeight: 1.3 }}>{item.name}</div>
@@ -197,7 +212,12 @@ function MenuCard({ item, qty, onAdd, onRemove }) {
         {!item.is_available ? (
           <span style={{ fontSize: 10, color: "#999" }}>Tidak tersedia</span>
         ) : qty === 0 ? (
-          <button onClick={() => onAdd(item.id)} style={{ width: "100%", border: "1.5px solid #B8860B", borderRadius: 8, background: "none", color: "#B8860B", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: "5px 0", fontFamily: "'Nunito',sans-serif" }}>+ Tambah</button>
+          <button
+            onClick={() => onAdd(item.id)}
+            style={{ width: "100%", border: "1.5px solid #B8860B", borderRadius: 8, background: "none", color: "#B8860B", fontSize: 11, fontWeight: 700, cursor: "pointer", padding: "5px 0", fontFamily: "'Nunito',sans-serif", transition: "background 0.15s, color 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#B8860B"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#B8860B"; }}
+          >+ Tambah</button>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "space-between" }}>
             <button onClick={() => onRemove(item.id)} style={{ width: 28, height: 28, borderRadius: 7, border: "1.5px solid #E8DCC8", background: "none", fontSize: 16, fontWeight: 700, cursor: "pointer", color: "#1A1208", display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
