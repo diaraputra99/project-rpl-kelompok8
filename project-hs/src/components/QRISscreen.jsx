@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/QRISscreen.css";
+import qrisImage from "/qris.jpeg";
 
 // ===================== CONSTANTS =====================
 const MERCHANT = {
@@ -28,33 +29,6 @@ const AUTO_BACK_SECONDS = 5;       // detik sebelum auto-back setelah expired
 // ===================== HELPERS =====================
 function formatTime(s) {
   return `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
-}
-
-function drawSimQR(canvas, amount) {
-  const size = 200, modules = 25, cell = size / modules;
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, size, size);
-  let seed = amount + 12345;
-  const rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-  ctx.fillStyle = "#1A1208";
-  for (let r = 0; r < modules; r++) {
-    for (let c = 0; c < modules; c++) {
-      const inFinder = (r < 8 && c < 8) || (r < 8 && c > modules - 9) || (r > modules - 9 && c < 8);
-      const inTiming = (r === 6 && c > 7 && c < modules - 8) || (c === 6 && r > 7 && r < modules - 8);
-      if (inFinder || inTiming) continue;
-      if (rand() > 0.5) ctx.fillRect(c * cell, r * cell, cell - 0.5, cell - 0.5);
-    }
-  }
-  [[0,0],[0,modules-7],[modules-7,0]].forEach(([row,col]) => {
-    ctx.fillStyle = "#1A1208"; ctx.fillRect(col*cell, row*cell, 7*cell, 7*cell);
-    ctx.fillStyle = "#FFFFFF"; ctx.fillRect((col+1)*cell, (row+1)*cell, 5*cell, 5*cell);
-    ctx.fillStyle = "#1A1208"; ctx.fillRect((col+2)*cell, (row+2)*cell, 3*cell, 3*cell);
-  });
-  ctx.fillStyle = "#1A1208";
-  for (let i = 8; i < modules - 8; i++) {
-    if (i % 2 === 0) { ctx.fillRect(6*cell, i*cell, cell, cell); ctx.fillRect(i*cell, 6*cell, cell, cell); }
-  }
 }
 
 // ===================== SUB-COMPONENTS =====================
@@ -95,25 +69,10 @@ function QRISCard({ canvasRef, subtotal, expired }) {
           <div style={{ fontWeight: 800, fontSize: 14, color: "#c0392b" }}>Sesi QRIS Berakhir</div>
         </div>
       )}
-      <div className="qris-card-header">
-        <div className="qris-header-left">
-          <span className="qris-title-text">QRIS</span>
-          <span className="qris-subtitle">QR Code Standar Nasional Indonesia</span>
-        </div>
-        <div className="gpn-badge">GPN</div>
-      </div>
       <div className="qris-card-body">
-        <div className="qris-merchant">
-          <div className="merchant-name">{MERCHANT.name}</div>
-          <div className="merchant-id">{MERCHANT.nmid}</div>
-        </div>
         <div className="qr-canvas-wrap">
-          <canvas ref={canvasRef} id="qrisCanvas" />
+          <img ref={canvasRef} src={qrisImage} alt="QRIS Payment" style={{ width: "100%", height: "auto" }} />
         </div>
-      </div>
-      <div className="qris-total-row">
-        <span className="qt-label">Total Pembayaran</span>
-        <span className="qt-amount">Rp{subtotal.toLocaleString("id")}</span>
       </div>
     </div>
   );
