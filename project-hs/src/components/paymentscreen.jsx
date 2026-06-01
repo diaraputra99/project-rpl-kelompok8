@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../styles/paymentscreen.css";
 
 // ===================== FORM WITH VALIDATION =====================
-function OrdererForm({ nama, noHp, email, onChange, errors }) {
+function OrdererForm({ nama, noHp, email, noMeja, onChange, errors }) {
   return (
     <div className="form-section">
       <div className="form-title">Informasi Pemesan</div>
@@ -59,8 +59,16 @@ function OrdererForm({ nama, noHp, email, onChange, errors }) {
         <label>Nomor Meja</label>
         <div className="field-wrap">
           <span className="field-icon">🪑</span>
-          <input type="text" value="7" readOnly className="input-readonly" />
+          <input
+            type="text"
+            value={noMeja || ""}
+            readOnly
+            className="input-readonly"
+            style={{ color: noMeja ? "#333" : "#999" }}
+            placeholder={noMeja ? "" : "Scan QR kode untuk meja"}
+          />
         </div>
+        {!noMeja && <div className="field-error" style={{ color: "#f39c12" }}>⚠ Silakan scan QR kode meja terlebih dahulu</div>}
       </div>
 
       <div className="store-notice">
@@ -116,7 +124,7 @@ function CashInfo() {
 }
 
 // ===================== MAIN SCREEN =====================
-export default function PaymentScreen({ subtotal = 0, onBack, onPay }) {
+export default function PaymentScreen({ subtotal = 0, noMeja = "", onBack, onPay }) {
   const [method, setMethod] = useState("online");
   const [agreed, setAgreed] = useState(true);
   const [form, setForm]     = useState({ nama: "", noHp: "", email: "" });
@@ -138,6 +146,8 @@ export default function PaymentScreen({ subtotal = 0, onBack, onPay }) {
       e.noHp = "Format tidak valid. Contoh: 08123456789";
     if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
       e.email = "Format email tidak valid.";
+    if (!noMeja)
+      e.noMeja = "Silakan scan QR kode meja terlebih dahulu.";
     if (method === "online" && !agreed)
       e.agreed = "Harap setujui syarat & ketentuan.";
     return e;
@@ -154,7 +164,7 @@ export default function PaymentScreen({ subtotal = 0, onBack, onPay }) {
       }, 50);
       return;
     }
-    onPay({ method, agreed, ...form });
+    onPay({ method, agreed, noMeja, ...form });
   }
 
   return (
@@ -171,7 +181,7 @@ export default function PaymentScreen({ subtotal = 0, onBack, onPay }) {
 
       <div className="scroll-content">
         <div className="scroll-inner">
-          <OrdererForm nama={form.nama} noHp={form.noHp} email={form.email} onChange={handleChange} errors={errors} />
+          <OrdererForm nama={form.nama} noHp={form.noHp} email={form.email} noMeja={noMeja} onChange={handleChange} errors={errors} />
           <MethodSelector method={method} onSelect={(m) => { setMethod(m); setErrors(p => ({ ...p, agreed: "" })); }} />
           {method === "online" ? (
             <QRISOption agreed={agreed} onToggle={() => { setAgreed(v => !v); setErrors(p => ({ ...p, agreed: "" })); }} error={errors.agreed} />
