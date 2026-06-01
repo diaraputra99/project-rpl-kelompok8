@@ -124,7 +124,7 @@ function CashInfo() {
 }
 
 // ===================== MAIN SCREEN =====================
-export default function PaymentScreen({ subtotal = 0, noMeja = "", onBack, onPay }) {
+export default function PaymentScreen({ subtotal = 0, tableNumber = "", onBack, onPay }) {
   const [method, setMethod] = useState("online");
   const [agreed, setAgreed] = useState(true);
   const [form, setForm]     = useState({ nama: "", noHp: "", email: "" });
@@ -146,7 +146,7 @@ export default function PaymentScreen({ subtotal = 0, noMeja = "", onBack, onPay
       e.noHp = "Format tidak valid. Contoh: 08123456789";
     if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
       e.email = "Format email tidak valid.";
-    if (!noMeja)
+    if (!tableNumber)
       e.noMeja = "Silakan scan QR kode meja terlebih dahulu.";
     if (method === "online" && !agreed)
       e.agreed = "Harap setujui syarat & ketentuan.";
@@ -164,7 +164,7 @@ export default function PaymentScreen({ subtotal = 0, noMeja = "", onBack, onPay
       }, 50);
       return;
     }
-    onPay({ method, agreed, noMeja, ...form });
+    onPay({ method, agreed, noMeja: tableNumber, ...form });
   }
 
   return (
@@ -181,7 +181,7 @@ export default function PaymentScreen({ subtotal = 0, noMeja = "", onBack, onPay
 
       <div className="scroll-content">
         <div className="scroll-inner">
-          <OrdererForm nama={form.nama} noHp={form.noHp} email={form.email} noMeja={noMeja} onChange={handleChange} errors={errors} />
+          <OrdererForm nama={form.nama} noHp={form.noHp} email={form.email} noMeja={tableNumber} onChange={handleChange} errors={errors} />
           <MethodSelector method={method} onSelect={(m) => { setMethod(m); setErrors(p => ({ ...p, agreed: "" })); }} />
           {method === "online" ? (
             <QRISOption agreed={agreed} onToggle={() => { setAgreed(v => !v); setErrors(p => ({ ...p, agreed: "" })); }} error={errors.agreed} />
