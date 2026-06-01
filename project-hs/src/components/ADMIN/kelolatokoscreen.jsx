@@ -297,32 +297,7 @@ export default function KelolaTokoScreen() {
         </>
       )}
 
-      {/* Catatan setup DB */}
-      <div style={{ marginTop: 24, background: "#FFF9E6", border: "1px solid #ffc107", borderRadius: 10, padding: "14px 18px", fontSize: 12, color: "#856404", wordBreak: "break-word", overflowWrap: "break-word" }}>
-        <strong>⚠️ Setup Database (sekali saja)</strong> — jalankan di Supabase SQL Editor:
-        <pre style={{
-          marginTop: 10, background: "#1A1208", color: "#E8A020",
-          borderRadius: 8, padding: "12px 14px", fontSize: 11,
-          overflowX: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word",
-          lineHeight: 1.7, fontFamily: "monospace",
-        }}>{`CREATE TABLE IF NOT EXISTS store_settings (
-  id int PRIMARY KEY DEFAULT 1,
-  name text, address text, phone text,
-  description text, maps_url text, instagram text
-);
-
-CREATE TABLE IF NOT EXISTS store_hours (
-  id int PRIMARY KEY, day text NOT NULL,
-  is_open boolean DEFAULT true,
-  open_time text DEFAULT '00:00',
-  close_time text DEFAULT '23:59',
-  is_24h boolean DEFAULT true
-);
-
-INSERT INTO store_settings (id, name)
-VALUES (1, 'Warkop HS Balio')
-ON CONFLICT (id) DO NOTHING;`}</pre>
-      </div>
+      
     </div>
   );
 }
