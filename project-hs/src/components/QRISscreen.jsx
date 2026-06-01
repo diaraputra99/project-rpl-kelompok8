@@ -169,15 +169,15 @@ export default function QRISScreen({ subtotal = 0, onBack, onCheckStatus }) {
   // Gambar QR canvas
   useEffect(() => {
     if (canvasRef.current && subtotal >= 0) {
-      drawSimQR(canvasRef.current, subtotal || 54000);
+      // Image sudah dimuat, tidak perlu generate QR
     }
   }, [subtotal]);
 
   function handleDownloadQR() {
     if (!canvasRef.current) return;
     const link = document.createElement("a");
-    link.download = "QRIS-WarkopHS.png";
-    link.href = canvasRef.current.toDataURL();
+    link.download = "QRIS-WarkopHS.jpeg";
+    link.href = qrisImage;
     link.click();
   }
 
