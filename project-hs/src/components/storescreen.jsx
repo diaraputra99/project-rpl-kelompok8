@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/storescreen.css";
+import { supabase } from "../supabase";
 
 // ===================== DATA =====================
-const STORE = {
+const DEFAULT_STORE = {
   name: "Warkop HS Balio",
   address: "Jl. Babakan Lor No.25, Bogor Barat, Bogor",
-  hours: "Buka 24 Jam",
+  phone: "08123456789",
+  maps_url: "",
 };
 
 const SCHEDULE = [
@@ -25,24 +27,34 @@ const TODAY_IDX = JS_DAY === 0 ? 6 : JS_DAY - 1;
 
 // ===================== SUB-COMPONENTS =====================
 
-function StoreHero() {
+function StoreHero({ name, address }) {
   return (
     <div className="store-hero">
-      <h2>{STORE.name}</h2>
+      <h2>{name || DEFAULT_STORE.name}</h2>
       <p>
-        <span>📍</span> {STORE.address}
+        <span>📍</span> {address || DEFAULT_STORE.address}
       </p>
     </div>
   );
 }
 
-function StoreActions({ onCall, onMaps }) {
+function StoreActions({ onCall, onMaps, isPhoneAvailable, isMapsAvailable }) {
   return (
     <div className="store-actions">
-      <button className="store-action-btn" onClick={onCall}>
+      <button 
+        className="store-action-btn" 
+        onClick={onCall}
+        disabled={!isPhoneAvailable}
+        style={!isPhoneAvailable ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+      >
         📞 Hubungi Toko
       </button>
-      <button className="store-action-btn" onClick={onMaps}>
+      <button 
+        className="store-action-btn" 
+        onClick={onMaps}
+        disabled={!isMapsAvailable}
+        style={!isMapsAvailable ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+      >
         🗺️ Kunjungi Toko
       </button>
     </div>
@@ -70,51 +82,72 @@ function ScheduleTable() {
 
 export default function StoreScreen({
   onBack,
-  onShareLink,
   onGoToMenu,
   onGoToHistory,
   onGoToProfile,
 }) {
+  const [store, setStore] = useState(DEFAULT_STORE);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStore() {
+      setLoading(true);
+      const { data } = await supabase
+        .from("store_settings")
+        .select("*")
+        .eq("id", 1)
+        .single();
+      if (data) {
+        setStore(data);
+      }
+      setLoading(false);
+    }
+    fetchStore();
+  }, []);
+
+  const handleCallWhatsApp = () => {
+    if (store.phone) {
+      // Format: https://wa.me/6281234567890 (remove leading 0, add country code 62)
+      const phoneFormatted = store.phone.replace(/^0/, "62");
+      const waLink = `https://wa.me/${phoneFormatted}`;
+      window.open(waLink, "_blank");
+    }
+  };
+
+  const handleOpenMaps = () => {
+    if (store.maps_url) {
+      window.open(store.maps_url, "_blank");
+    }
+  };
+
   return (
     <div className="store-screen">
-
-
-
       {/* TOP BAR */}
       <div className="topbar">
         <button className="back-btn" onClick={onBack}>←</button>
         <h2>Informasi Toko</h2>
-        <button className="share-btn" onClick={onShareLink}>🔗</button>
+        <div style={{ width: 32 }} />
       </div>
 
       {/* CONTENT */}
       <div className="scroll-content">
-        <StoreHero />
-
-        <StoreActions
-          onCall={() => alert("Membuka telepon...")}
-          onMaps={() => alert("Membuka Maps...")}
-        />
-
-        <ScheduleTable />
-
-        <div className="spacer" />
-      </div>
-
-      {/* BOTTOM NAV */}
-      <div className="bottom-nav">
-        <button className="nav-item" onClick={onGoToMenu}>
-          <span className="nav-icon">🍽️</span>Menu
-        </button>
-        <button className="nav-item active">
-          <span className="nav-icon">🏪</span>Toko
-        </button>
-        <button className="nav-item" onClick={onGoToHistory}>
-          <span className="nav-icon">📋</span>Pesanan
-        </button>
-        <button className="nav-item" onClick={onGoToProfile}>
-          <span className="nav-icon">👤</span>Profil
-        </button>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: 40, fontSize: 13, color: "#9A8A70" }}>
+            Memuat informasi toko...
+          </div>
+        ) : (
+          <>
+            <StoreHero name={store.name} address={store.address} />
+            <StoreActions 
+              onCall={handleCallWhatsApp}
+              onMaps={handleOpenMaps}
+              isPhoneAvailable={!!store.phone}
+              isMapsAvailable={!!store.maps_url}
+            />
+            <ScheduleTable />
+            <div className="spacer" />
+          </>
+        )}
       </div>
     </div>
   );

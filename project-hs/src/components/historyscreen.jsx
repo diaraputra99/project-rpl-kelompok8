@@ -99,21 +99,6 @@ export default function HistoryScreen({
           <EmptyState icon="📅" label="Anda belum memiliki reservasi" />
         )}
       </div>
-
-      <div className="bottom-nav">
-        <button className="nav-item" onClick={onGoToMenu}>
-          <span className="nav-icon">🍽️</span>Menu
-        </button>
-        <button className="nav-item" onClick={onGoToStore}>
-          <span className="nav-icon">🏪</span>Toko
-        </button>
-        <button className="nav-item active">
-          <span className="nav-icon">📋</span>Pesanan
-        </button>
-        <button className="nav-item" onClick={onGoToProfile}>
-          <span className="nav-icon">👤</span>Profil
-        </button>
-      </div>
     </div>
   );
 }

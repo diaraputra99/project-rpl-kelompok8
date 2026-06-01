@@ -33,7 +33,6 @@ function HamburgerDrawer({ open, onClose, screen, onNavigate, cartQty }) {
     { icon: "🛒", label: "Keranjang",        key: "cart",    badge: cartQty },
     { icon: "📋", label: "Riwayat Pesanan",  key: "history" },
     { icon: "🏪", label: "Info Toko",        key: "store" },
-    { icon: "👤", label: "Profil",           key: "profile" },
   ];
 
   return (
@@ -65,8 +64,8 @@ function HamburgerDrawer({ open, onClose, screen, onNavigate, cartQty }) {
             <button onClick={onClose} style={{
               background: "rgba(255,255,255,0.12)", border: "none", color: "#fff",
               width: 30, height: 30, borderRadius: "50%", cursor: "pointer",
-              fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center",
-            }}>✕</button>
+              fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center",
+            }}>←</button>
           </div>
         </div>
 
@@ -100,10 +99,6 @@ function HamburgerDrawer({ open, onClose, screen, onNavigate, cartQty }) {
               </button>
             );
           })}
-        </div>
-
-        <div style={{ padding: "12px 20px 20px", borderTop: "1px solid #E8DCC8", textAlign: "center", fontSize: 11, color: "#C8B89A" }}>
-          RestoFlow · v1.0.0
         </div>
       </div>
     </>
@@ -642,7 +637,6 @@ export default function App() {
         {screen === "store" && (
           <StoreScreen
             onBack={() => setScreen("menu")}
-            onShareLink={() => showToast("Link disalin!")}
             onGoToMenu={() => setScreen("menu")}
             onGoToHistory={() => setScreen("history")}
             onGoToProfile={() => setScreen("profile")}
