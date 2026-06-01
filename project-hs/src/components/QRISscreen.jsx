@@ -4,8 +4,7 @@ import qrisImage from "/qris.jpeg";
 
 // ===================== CONSTANTS =====================
 const MERCHANT = {
-  name: "SYAARI, MAKANAN & MINUMAN",
-  nmid: "NMID: 101234567891234",
+
 };
 
 const PAY_STEPS = {
