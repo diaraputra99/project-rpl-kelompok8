@@ -15,6 +15,24 @@ const STYLE = {
   label: { fontSize: 12, fontWeight: 600, color: "#555", display: "block", marginBottom: 5 },
 };
 
+// ===================== TOAST =====================
+function Toast({ msg }) {
+  if (!msg) return null;
+  return (
+    <div style={{
+      position: "fixed", top: 20, right: 24,
+      background: msg.startsWith("✓") ? "#27ae60" : "#c0392b",
+      color: "#fff", padding: "10px 20px", borderRadius: 10,
+      fontSize: 13, fontWeight: 700, zIndex: 999,
+      boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+      animation: "toastIn 0.2s ease",
+    }}>
+      <style>{"@keyframes toastIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}"}</style>
+      {msg}
+    </div>
+  );
+}
+
 // ===================== IMAGE UPLOADER =====================
 function ImageUploader({ currentUrl, onUploaded }) {
   const inputRef = useRef();
@@ -26,20 +44,10 @@ function ImageUploader({ currentUrl, onUploaded }) {
     if (!file) return;
     setPreview(URL.createObjectURL(file));
     setUploading(true);
-
     const ext      = file.name.split(".").pop();
     const fileName = `menu_${Date.now()}.${ext}`;
-    const { error } = await supabase.storage
-      .from("menu-images")
-      .upload(fileName, file, { upsert: true });
-
-    if (error) {
-      alert("Gagal upload: " + error.message);
-      setPreview(currentUrl || "");
-      setUploading(false);
-      return;
-    }
-
+    const { error } = await supabase.storage.from("menu-images").upload(fileName, file, { upsert: true });
+    if (error) { alert("Gagal upload: " + error.message); setPreview(currentUrl || ""); setUploading(false); return; }
     const { data } = supabase.storage.from("menu-images").getPublicUrl(fileName);
     setPreview(data.publicUrl);
     onUploaded(data.publicUrl);
@@ -49,56 +57,36 @@ function ImageUploader({ currentUrl, onUploaded }) {
   return (
     <div>
       <label style={STYLE.label}>Gambar Menu</label>
-      <div
-        onClick={() => inputRef.current.click()}
-        style={{
-          border: "2px dashed #E0E0E0", borderRadius: 10, padding: 12,
-          textAlign: "center", cursor: "pointer", background: "#FAFAFA",
-          transition: "border-color 0.15s", minHeight: 120,
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: 8,
-        }}
+      <div onClick={() => inputRef.current.click()} style={{
+        border: "2px dashed #E0E0E0", borderRadius: 10, padding: 12, textAlign: "center",
+        cursor: "pointer", background: "#FAFAFA", transition: "border-color 0.15s",
+        minHeight: 120, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
+      }}
         onMouseEnter={e => e.currentTarget.style.borderColor = "#B8860B"}
         onMouseLeave={e => e.currentTarget.style.borderColor = "#E0E0E0"}
       >
-        {uploading ? (
-          <div style={{ color: "#888", fontSize: 13 }}>⏳ Mengupload...</div>
-        ) : preview ? (
-          <>
-            <img src={preview} alt="preview" style={{ width: 90, height: 90, objectFit: "cover", borderRadius: 8 }} />
-            <span style={{ fontSize: 11, color: "#888" }}>Klik untuk ganti gambar</span>
-          </>
-        ) : (
-          <>
-            <div style={{ fontSize: 32 }}>🖼️</div>
-            <div style={{ fontSize: 13, color: "#888" }}>Klik untuk upload gambar</div>
-            <div style={{ fontSize: 11, color: "#aaa" }}>JPG, PNG, WEBP (maks 2MB)</div>
-          </>
-        )}
+        {uploading ? <div style={{ color: "#888", fontSize: 13 }}>⏳ Mengupload...</div>
+          : preview ? <><img src={preview} alt="preview" style={{ width: 90, height: 90, objectFit: "cover", borderRadius: 8 }} /><span style={{ fontSize: 11, color: "#888" }}>Klik untuk ganti</span></>
+          : <><div style={{ fontSize: 32 }}>🖼️</div><div style={{ fontSize: 13, color: "#888" }}>Klik untuk upload</div><div style={{ fontSize: 11, color: "#aaa" }}>JPG, PNG, WEBP (maks 2MB)</div></>}
       </div>
       <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
     </div>
   );
 }
 
-// ===================== KONFIRMASI HAPUS MODAL =====================
-function DeleteConfirmModal({ item, onCancel, onConfirm, deleting }) {
+// ===================== KONFIRMASI HAPUS =====================
+function DeleteConfirmModal({ name, deleting, onCancel, onConfirm }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ background: "#fff", borderRadius: 16, padding: 28, width: 360, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>🗑️</div>
-        <h3 style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 700 }}>Hapus Menu?</h3>
+        <h3 style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 700 }}>Hapus?</h3>
         <p style={{ fontSize: 13, color: "#666", margin: "0 0 20px", lineHeight: 1.5 }}>
-          Yakin ingin menghapus <strong>"{item.name}"</strong>?<br />
-          Tindakan ini tidak bisa dibatalkan.
+          Yakin hapus <strong>"{name}"</strong>? Tidak bisa dibatalkan.
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
           <button style={STYLE.btn("#F0F0F0", "#333")} onClick={onCancel} disabled={deleting}>Batal</button>
-          <button
-            style={{ ...STYLE.btn("#c0392b"), opacity: deleting ? 0.7 : 1 }}
-            onClick={onConfirm}
-            disabled={deleting}
-          >
+          <button style={{ ...STYLE.btn("#c0392b"), opacity: deleting ? 0.7 : 1 }} onClick={onConfirm} disabled={deleting}>
             {deleting ? "Menghapus..." : "Ya, Hapus"}
           </button>
         </div>
@@ -115,31 +103,17 @@ function MenuModal({ item, categories, onClose, onSave }) {
       : { name: "", price: "", category_id: categories[0]?.id || "", description: "", image_url: "", is_available: true }
   );
   const [saving, setSaving] = useState(false);
-
   function set(key, val) { setForm(f => ({ ...f, [key]: val })); }
 
   async function handleSave() {
     if (!form.name.trim() || !form.price) return alert("Nama dan harga wajib diisi.");
     setSaving(true);
-
-    const payload = {
-      name:         form.name.trim(),
-      price:        Number(form.price),
-      category_id:  form.category_id || null,
-      description:  form.description,
-      image_url:    form.image_url,
-      is_available: form.is_available,
-    };
-
+    const payload = { name: form.name.trim(), price: Number(form.price), category_id: form.category_id || null, description: form.description, image_url: form.image_url, is_available: form.is_available };
     let error;
-    if (item) {
-      ({ error } = await supabase.from("menus").update(payload).eq("id", item.id));
-    } else {
-      ({ error } = await supabase.from("menus").insert(payload));
-    }
-
+    if (item) ({ error } = await supabase.from("menus").update(payload).eq("id", item.id));
+    else      ({ error } = await supabase.from("menus").insert(payload));
     setSaving(false);
-    if (error) { alert("Gagal menyimpan: " + error.message); return; }
+    if (error) { alert("Gagal: " + error.message); return; }
     onSave();
   }
 
@@ -149,14 +123,8 @@ function MenuModal({ item, categories, onClose, onSave }) {
         <h3 style={{ margin: "0 0 20px", fontSize: 17, fontWeight: 700 }}>{item ? "Edit Menu" : "Tambah Menu"}</h3>
         <div style={{ display: "grid", gap: 14 }}>
           <ImageUploader currentUrl={form.image_url} onUploaded={url => set("image_url", url)} />
-          <div>
-            <label style={STYLE.label}>Nama Menu *</label>
-            <input style={STYLE.input} value={form.name} onChange={e => set("name", e.target.value)} placeholder="Contoh: Kopi Susu" />
-          </div>
-          <div>
-            <label style={STYLE.label}>Harga (Rp) *</label>
-            <input style={STYLE.input} type="number" value={form.price} onChange={e => set("price", e.target.value)} placeholder="8000" />
-          </div>
+          <div><label style={STYLE.label}>Nama Menu *</label><input style={STYLE.input} value={form.name} onChange={e => set("name", e.target.value)} placeholder="Contoh: Kopi Susu" /></div>
+          <div><label style={STYLE.label}>Harga (Rp) *</label><input style={STYLE.input} type="number" value={form.price} onChange={e => set("price", e.target.value)} placeholder="8000" /></div>
           <div>
             <label style={STYLE.label}>Kategori</label>
             <select style={STYLE.input} value={form.category_id} onChange={e => set("category_id", e.target.value)}>
@@ -164,10 +132,7 @@ function MenuModal({ item, categories, onClose, onSave }) {
               {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
-          <div>
-            <label style={STYLE.label}>Deskripsi</label>
-            <textarea style={{ ...STYLE.input, height: 70, resize: "vertical" }} value={form.description} onChange={e => set("description", e.target.value)} placeholder="Opsional" />
-          </div>
+          <div><label style={STYLE.label}>Deskripsi</label><textarea style={{ ...STYLE.input, height: 70, resize: "vertical" }} value={form.description} onChange={e => set("description", e.target.value)} placeholder="Opsional" /></div>
           <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
             <input type="checkbox" checked={form.is_available} onChange={e => set("is_available", e.target.checked)} />
             Tersedia / Aktif
@@ -175,11 +140,127 @@ function MenuModal({ item, categories, onClose, onSave }) {
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
           <button style={STYLE.btn("#F0F0F0", "#333")} onClick={onClose}>Batal</button>
-          <button style={{ ...STYLE.btn("#1A1208"), opacity: saving ? 0.7 : 1 }} onClick={handleSave} disabled={saving}>
-            {saving ? "Menyimpan..." : "Simpan"}
-          </button>
+          <button style={{ ...STYLE.btn("#1A1208"), opacity: saving ? 0.7 : 1 }} onClick={handleSave} disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ===================== KELOLA KATEGORI MODAL =====================
+function KategoriModal({ categories, onClose, onRefresh }) {
+  const [list, setList]         = useState(categories);
+  const [newName, setNewName]   = useState("");
+  const [editId, setEditId]     = useState(null);
+  const [editName, setEditName] = useState("");
+  const [loading, setLoading]   = useState(false);
+  const [toast, setToast]       = useState("");
+  const [delTarget, setDelTarget] = useState(null);
+  const [deleting, setDeleting]   = useState(false);
+
+  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 2500); }
+
+  async function handleAdd() {
+    if (!newName.trim()) return;
+    setLoading(true);
+    const { data, error } = await supabase.from("categories").insert({ name: newName.trim() }).select().single();
+    setLoading(false);
+    if (error) { showToast("❌ Gagal: " + error.message); return; }
+    setList(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
+    setNewName("");
+    showToast("✓ Kategori ditambahkan!");
+    onRefresh();
+  }
+
+  async function handleEdit(id) {
+    if (!editName.trim()) return;
+    setLoading(true);
+    const { error } = await supabase.from("categories").update({ name: editName.trim() }).eq("id", id);
+    setLoading(false);
+    if (error) { showToast("❌ Gagal: " + error.message); return; }
+    setList(prev => prev.map(c => c.id === id ? { ...c, name: editName.trim() } : c));
+    setEditId(null); setEditName("");
+    showToast("✓ Kategori diperbarui!");
+    onRefresh();
+  }
+
+  async function handleDelete() {
+    if (!delTarget) return;
+    setDeleting(true);
+    const { error } = await supabase.from("categories").delete().eq("id", delTarget.id);
+    setDeleting(false);
+    setDelTarget(null);
+    if (error) {
+      if (error.code === "23503") showToast("❌ Kategori masih dipakai oleh menu, tidak bisa dihapus.");
+      else showToast("❌ Gagal: " + error.message);
+      return;
+    }
+    setList(prev => prev.filter(c => c.id !== delTarget.id));
+    showToast("✓ Kategori dihapus!");
+    onRefresh();
+  }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 250, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: "#fff", borderRadius: 16, padding: 28, width: 420, maxHeight: "85vh", display: "flex", flexDirection: "column", boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }}>
+        <Toast msg={toast} />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Kelola Kategori</h3>
+          <button style={STYLE.btn("#F0F0F0", "#333")} onClick={onClose}>✕ Tutup</button>
+        </div>
+
+        {/* Tambah kategori baru */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          <input
+            style={{ ...STYLE.input, flex: 1 }}
+            placeholder="Nama kategori baru..."
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleAdd()}
+          />
+          <button style={{ ...STYLE.btn("#1A1208"), whiteSpace: "nowrap", opacity: loading ? 0.7 : 1 }} onClick={handleAdd} disabled={loading || !newName.trim()}>
+            + Tambah
+          </button>
+        </div>
+
+        {/* List kategori */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {list.length === 0 ? (
+            <div style={{ textAlign: "center", padding: 24, color: "#aaa", fontSize: 13 }}>Belum ada kategori</div>
+          ) : list.map(cat => (
+            <div key={cat.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 0", borderBottom: "1px solid #F0F0F0" }}>
+              {editId === cat.id ? (
+                <>
+                  <input
+                    autoFocus
+                    style={{ ...STYLE.input, flex: 1, padding: "6px 10px" }}
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") handleEdit(cat.id); if (e.key === "Escape") { setEditId(null); setEditName(""); }}}
+                  />
+                  <button style={STYLE.btn("#27ae60")} onClick={() => handleEdit(cat.id)}>✓</button>
+                  <button style={STYLE.btn("#F0F0F0", "#555")} onClick={() => { setEditId(null); setEditName(""); }}>✕</button>
+                </>
+              ) : (
+                <>
+                  <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>🏷️ {cat.name}</span>
+                  <button style={STYLE.btn("#F0F0F0", "#333")} onClick={() => { setEditId(cat.id); setEditName(cat.name); }}>Edit</button>
+                  <button style={STYLE.btn("#fdecea", "#c0392b")} onClick={() => setDelTarget(cat)}>Hapus</button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {delTarget && (
+        <DeleteConfirmModal
+          name={delTarget.name}
+          deleting={deleting}
+          onCancel={() => setDelTarget(null)}
+          onConfirm={handleDelete}
+        />
+      )}
     </div>
   );
 }
@@ -191,10 +272,11 @@ export default function KelolaMenuScreen() {
   const [loading, setLoading]       = useState(true);
   const [search, setSearch]         = useState("");
   const [filterCat, setFilterCat]   = useState("Semua");
-  const [modal, setModal]           = useState(null);        // null | "add" | item object
-  const [deleteTarget, setDeleteTarget] = useState(null);    // item yang akan dihapus
+  const [modal, setModal]           = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting]     = useState(false);
   const [toast, setToast]           = useState("");
+  const [showKategori, setShowKategori] = useState(false);
 
   async function fetchData() {
     setLoading(true);
@@ -209,51 +291,27 @@ export default function KelolaMenuScreen() {
 
   useEffect(() => { fetchData(); }, []);
 
-  function showToast(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(""), 3000);
-  }
+  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 3000); }
 
-  // FIX: delete dengan optimistic update + error handling yang jelas
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-
-    const { error } = await supabase
-      .from("menus")
-      .delete()
-      .eq("id", deleteTarget.id);
-
+    const { error } = await supabase.from("menus").delete().eq("id", deleteTarget.id);
     setDeleting(false);
     setDeleteTarget(null);
-
     if (error) {
-      // Cek apakah error karena foreign key (menu masih ada di order_items)
-      if (error.code === "23503") {
-        showToast("❌ Menu tidak bisa dihapus karena masih ada di riwayat pesanan.");
-      } else {
-        showToast("❌ Gagal menghapus: " + error.message);
-      }
+      if (error.code === "23503") showToast("❌ Menu ada di riwayat pesanan, tidak bisa dihapus.");
+      else showToast("❌ Gagal: " + error.message);
       return;
     }
-
-    // Optimistic: langsung hapus dari state, tidak perlu refetch
     setMenus(prev => prev.filter(m => m.id !== deleteTarget.id));
     showToast("✓ Menu berhasil dihapus.");
   }
 
   async function handleToggle(item) {
-    // Optimistic update dulu
     setMenus(prev => prev.map(m => m.id === item.id ? { ...m, is_available: !m.is_available } : m));
-    const { error } = await supabase
-      .from("menus")
-      .update({ is_available: !item.is_available })
-      .eq("id", item.id);
-    if (error) {
-      // Rollback kalau gagal
-      setMenus(prev => prev.map(m => m.id === item.id ? { ...m, is_available: item.is_available } : m));
-      showToast("❌ Gagal mengubah status.");
-    }
+    const { error } = await supabase.from("menus").update({ is_available: !item.is_available }).eq("id", item.id);
+    if (error) { setMenus(prev => prev.map(m => m.id === item.id ? { ...m, is_available: item.is_available } : m)); showToast("❌ Gagal ubah status."); }
   }
 
   const filtered = menus.filter(m => {
@@ -264,27 +322,17 @@ export default function KelolaMenuScreen() {
 
   return (
     <div style={{ padding: 24, fontFamily: "sans-serif" }}>
-      {/* Toast */}
-      {toast && (
-        <div style={{
-          position: "fixed", top: 20, right: 24,
-          background: toast.startsWith("✓") ? "#27ae60" : "#c0392b",
-          color: "#fff", padding: "10px 20px", borderRadius: 10,
-          fontSize: 13, fontWeight: 700, zIndex: 999,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-          animation: "toastIn 0.2s ease",
-        }}>
-          <style>{`@keyframes toastIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}`}</style>
-          {toast}
-        </div>
-      )}
+      <Toast msg={toast} />
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Kelola Menu</h2>
-          <p style={{ margin: "4px 0 0", color: "#888", fontSize: 13 }}>{menus.length} item menu</p>
+          <p style={{ margin: "4px 0 0", color: "#888", fontSize: 13 }}>{menus.length} item menu · {categories.length} kategori</p>
         </div>
-        <button style={STYLE.btn("#1A1208")} onClick={() => setModal("add")}>+ Tambah Menu</button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button style={STYLE.btn("#5a4a8a")} onClick={() => setShowKategori(true)}>🏷️ Kelola Kategori</button>
+          <button style={STYLE.btn("#1A1208")} onClick={() => setModal("add")}>+ Tambah Menu</button>
+        </div>
       </div>
 
       <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
@@ -314,9 +362,7 @@ export default function KelolaMenuScreen() {
                 <tr key={item.id} style={{ borderBottom: i < filtered.length - 1 ? "1px solid #F0F0F0" : "none" }}>
                   <td style={{ padding: "10px 16px" }}>
                     <div style={{ width: 48, height: 48, borderRadius: 8, overflow: "hidden", background: "#F5E9C9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
-                      {item.image_url
-                        ? <img src={item.image_url} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                        : "🍽️"}
+                      {item.image_url ? <img src={item.image_url} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "🍽️"}
                     </div>
                   </td>
                   <td style={{ padding: "10px 16px", fontWeight: 600 }}>
@@ -326,16 +372,11 @@ export default function KelolaMenuScreen() {
                   <td style={{ padding: "10px 16px", color: "#555" }}>{item.categories?.name || "—"}</td>
                   <td style={{ padding: "10px 16px", fontWeight: 700 }}>Rp{Number(item.price).toLocaleString("id")}</td>
                   <td style={{ padding: "10px 16px" }}>
-                    <span
-                      onClick={() => handleToggle(item)}
-                      title="Klik untuk toggle ketersediaan"
-                      style={{
-                        display: "inline-block", padding: "3px 10px", borderRadius: 20, fontSize: 11,
-                        fontWeight: 700, cursor: "pointer",
-                        background: item.is_available ? "#d4edda" : "#f8d7da",
-                        color: item.is_available ? "#155724" : "#721c24",
-                      }}
-                    >
+                    <span onClick={() => handleToggle(item)} title="Klik untuk toggle" style={{
+                      display: "inline-block", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, cursor: "pointer",
+                      background: item.is_available ? "#d4edda" : "#f8d7da",
+                      color: item.is_available ? "#155724" : "#721c24",
+                    }}>
                       {item.is_available ? "✓ Tersedia" : "✗ Habis"}
                     </span>
                   </td>
@@ -352,7 +393,6 @@ export default function KelolaMenuScreen() {
         </div>
       )}
 
-      {/* Modal edit/tambah */}
       {modal && (
         <MenuModal
           item={modal === "add" ? null : modal}
@@ -362,13 +402,20 @@ export default function KelolaMenuScreen() {
         />
       )}
 
-      {/* Modal konfirmasi hapus */}
       {deleteTarget && (
         <DeleteConfirmModal
-          item={deleteTarget}
+          name={deleteTarget.name}
           deleting={deleting}
           onCancel={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
+        />
+      )}
+
+      {showKategori && (
+        <KategoriModal
+          categories={categories}
+          onClose={() => setShowKategori(false)}
+          onRefresh={fetchData}
         />
       )}
     </div>

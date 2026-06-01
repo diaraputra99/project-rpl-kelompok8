@@ -216,7 +216,7 @@ function MenuCard({ item, qty, onAdd, onRemove }) {
 }
 
 // ===================== MENU SCREEN =====================
-function MenuScreen({ cart, onAdd, onRemove, onCartClick, onHamburger }) {
+function MenuScreen({ cart, onAdd, onRemove, onCartClick, onHamburger, tableNumber }) {
   const [menuData, setMenuData]             = useState([]);
   const [categories, setCategories]         = useState([]);
   const [activeCategory, setActiveCategory] = useState("Semua");
@@ -254,7 +254,7 @@ function MenuScreen({ cart, onAdd, onRemove, onCartClick, onHamburger }) {
       {/* Header */}
       <div style={{ background: "#fff", padding: "12px 16px 0", borderBottom: "1px solid #E8DCC8", flexShrink: 0 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <span style={{ background: "#F5E9C9", border: "1px solid #E8DCC8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#8B6508" }}>🪑 Meja 7</span>
+          <span style={{ background: "#F5E9C9", border: "1px solid #E8DCC8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#8B6508" }}>🪑 Meja {tableNumber}</span>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#1A1208" }}>Warkop HS Balio</span>
           {/* HAMBURGER */}
           <button onClick={onHamburger} aria-label="Menu navigasi"
@@ -318,7 +318,7 @@ function MenuScreen({ cart, onAdd, onRemove, onCartClick, onHamburger }) {
 }
 
 // ===================== CART SCREEN =====================
-function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, onHamburger }) {
+function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, onHamburger, tableNumber }) {
   const cartArr  = Object.entries(cart).map(([id, qty]) => ({ ...menuData.find(m => m.id === Number(id)), qty })).filter(Boolean);
   const subtotal = cartArr.reduce((s, i) => s + Number(i.price) * i.qty, 0);
   return (
@@ -375,7 +375,7 @@ function CartScreen({ cart, menuData, onAdd, onRemove, onBack, onCheckout, onHam
 }
 
 // ===================== SUCCESS SCREEN =====================
-function SuccessScreen({ orderCode, customerEmail, paymentMethod, onBackToMenu }) {
+function SuccessScreen({ orderCode, customerEmail, paymentMethod, tableNumber, onBackToMenu }) {
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FAF3EC" }}>
       <div style={{ background: "#fff", padding: "12px 16px", borderBottom: "1px solid #E8DCC8" }}>
@@ -391,7 +391,7 @@ function SuccessScreen({ orderCode, customerEmail, paymentMethod, onBackToMenu }
           {orderCode}
         </div>
         <div style={{ background: "#F5E9C9", borderRadius: 12, padding: "14px 20px", fontSize: 13, color: "#5A4A30", maxWidth: 280 }}>
-          🪑 Meja <strong>7</strong> &nbsp;|&nbsp;
+          🪑 Meja <strong>{tableNumber}</strong> &nbsp;|&nbsp;
           {paymentMethod === "cash" ? "💵 Bayar di Kasir" : "💳 QRIS"}
         </div>
         {customerEmail && (
@@ -418,6 +418,9 @@ function SuccessScreen({ orderCode, customerEmail, paymentMethod, onBackToMenu }
 
 // ===================== APP =====================
 export default function App() {
+  // FIX: Baca nomor meja dari URL ?meja=X, fallback ke 1
+  const tableNumber = Number(new URLSearchParams(window.location.search).get("meja")) || 1;
+
   const [screen, setScreen]           = useState("splash");
   const [cart, setCart]               = useState({});
   const [menuData, setMenuData]       = useState([]);
@@ -428,6 +431,10 @@ export default function App() {
   const [pendingCartArr, setPendingCartArr]   = useState([]);
   const [pendingSubtotal, setPendingSubtotal] = useState(0);
   const [customerInfo, setCustomerInfo]       = useState({});
+  // FIX race condition: ref selalu baca nilai terbaru di dalam async callback
+  const customerInfoRef = useRef({});
+  const pendingCartRef  = useRef([]);
+  const pendingTotalRef = useRef(0);
   const toastTimer = useRef(null);
 
   useEffect(() => {
@@ -452,30 +459,41 @@ export default function App() {
   const handleGoToPayment = useCallback((cartArr, subtotal) => {
     setPendingCartArr(cartArr);
     setPendingSubtotal(subtotal);
+    pendingCartRef.current  = cartArr;
+    pendingTotalRef.current = subtotal;
     setScreen("payment");
   }, []);
 
-  // ===== SUBMIT ORDER — payment_status sesuai metode =====
+  // ===== SUBMIT ORDER — pakai ref bukan state untuk hindari race condition =====
   const handleCheckout = useCallback(async (paymentMethod = "online") => {
+    // Baca dari ref — selalu dapat nilai terbaru tanpa masalah closure stale
+    const info     = customerInfoRef.current;
+    const cartArr  = pendingCartRef.current;
+    const subtotal = pendingTotalRef.current;
+
+    if (!cartArr || cartArr.length === 0) {
+      showToast("Keranjang kosong, tidak bisa checkout.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const { data: order, error: orderErr } = await supabase
         .from("orders")
         .insert({
-          table_number:   7,
-          total_price:    pendingSubtotal,
+          table_number:   tableNumber,
+          total_price:    subtotal,
           status:         "pending",
-          // FIX: QRIS → "paid", kasir → "unpaid" (admin update manual)
           payment_status: paymentMethod === "online" ? "paid" : "unpaid",
-          customer_name:  customerInfo.nama  || null,
-          customer_phone: customerInfo.noHp  || null,
-          customer_email: customerInfo.email || null,
+          customer_name:  info.nama  || null,
+          customer_phone: info.noHp  || null,
+          customer_email: info.email || null,
         })
         .select()
         .single();
       if (orderErr) throw orderErr;
 
-      const items = pendingCartArr.map(item => ({
+      const items = cartArr.map(item => ({
         order_id: order.id,
         menu_id:  item.id,
         quantity: item.qty,
@@ -484,20 +502,19 @@ export default function App() {
       const { error: itemsErr } = await supabase.from("order_items").insert(items);
       if (itemsErr) throw itemsErr;
 
-      // Kirim struk email (opsional)
-      if (customerInfo.email) {
+      if (info.email) {
         try {
           await supabase.functions.invoke("send-receipt", {
             body: {
-              to:           customerInfo.email,
-              customerName: customerInfo.nama || "Pelanggan",
+              to:           info.email,
+              customerName: info.nama || "Pelanggan",
               orderCode:    "#HS-" + order.id.slice(0, 8).toUpperCase(),
-              tableNumber:  7,
-              items: pendingCartArr.map(i => ({
+              tableNumber,
+              items: cartArr.map(i => ({
                 name: i.name, qty: i.qty,
                 price: Number(i.price), subtotal: Number(i.price) * i.qty,
               })),
-              total: pendingSubtotal,
+              total: subtotal,
             },
           });
         } catch (e) { console.warn("Email gagal:", e); }
@@ -507,6 +524,8 @@ export default function App() {
       setCart({});
       setPendingCartArr([]);
       setPendingSubtotal(0);
+      pendingCartRef.current  = [];
+      pendingTotalRef.current = 0;
       setScreen("success");
     } catch (err) {
       console.error(err);
@@ -514,10 +533,13 @@ export default function App() {
     } finally {
       setSubmitting(false);
     }
-  }, [pendingCartArr, pendingSubtotal, customerInfo, showToast]);
+  }, [tableNumber, showToast]);
 
   const handlePayMethodChosen = useCallback(({ method, nama, noHp, email }) => {
-    setCustomerInfo({ nama, noHp, email, method });
+    // Update state DAN ref sekaligus
+    const info = { nama, noHp, email, method };
+    setCustomerInfo(info);
+    customerInfoRef.current = info;  // ref langsung tersedia untuk handleCheckout
     if (method === "online") setScreen("qris");
     else handleCheckout("cash");
   }, [handleCheckout]);
@@ -566,6 +588,7 @@ export default function App() {
             cart={cart} onAdd={addToCart} onRemove={removeFromCart}
             onCartClick={() => setScreen("cart")}
             onHamburger={() => setDrawerOpen(true)}
+            tableNumber={tableNumber}
           />
         )}
 
@@ -575,6 +598,7 @@ export default function App() {
             onBack={() => setScreen("menu")}
             onCheckout={handleGoToPayment}
             onHamburger={() => setDrawerOpen(true)}
+            tableNumber={tableNumber}
           />
         )}
 
@@ -583,6 +607,7 @@ export default function App() {
             subtotal={pendingSubtotal}
             onBack={() => setScreen("cart")}
             onPay={handlePayMethodChosen}
+            tableNumber={tableNumber}
           />
         )}
 
@@ -599,6 +624,7 @@ export default function App() {
             orderCode={orderCode}
             customerEmail={customerInfo.email}
             paymentMethod={customerInfo.method}
+            tableNumber={tableNumber}
             onBackToMenu={() => { setCustomerInfo({}); setScreen("menu"); }}
           />
         )}
