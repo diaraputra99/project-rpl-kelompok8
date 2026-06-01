@@ -3,12 +3,14 @@ import "./App.css";
 import "./globals.css";
 import { supabase } from "../../supabase";
 
-import DashboardScreen   from "./dashboardscreen";
-import KelolaMenuScreen  from "./kelolamenuscreen";
-import KelolaStokScreen  from "./kelolastokscreen";
-import KelolaMejaScreen  from "./kelolamejascreen";
-import LaporanScreen     from "./laporanscreen";
+import DashboardScreen    from "./dashboardscreen";
+import KelolaMenuScreen   from "./kelolamenuscreen";
+import KelolaStokScreen   from "./kelolastokscreen";
+import KelolaMejaScreen   from "./kelolamejascreen";
+import LaporanScreen      from "./laporanscreen";
+import KelolaTokoScreen   from "./kelolatokoscreen";
 
+// ===================== LOGIN =====================
 function LoginScreen({ onLogin }) {
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
@@ -17,8 +19,7 @@ function LoginScreen({ onLogin }) {
 
   async function handleLogin(e) {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     const { error: authErr } = await supabase.auth.signInWithPassword({ email, password });
     if (authErr) setError("Email atau password salah.");
     else onLogin();
@@ -55,14 +56,26 @@ function LoginScreen({ onLogin }) {
   );
 }
 
+// ===================== NAV =====================
 const NAV = [
-  { label: "Dashboard",         icon: "⊞", key: "dashboard", group: "UTAMA" },
-  { label: "Kelola Menu",       icon: "🍽", key: "menu",      group: "OPERASIONAL" },
-  { label: "Kelola Stok",       icon: "📦", key: "stok",      group: "OPERASIONAL" },
-  { label: "Kelola Meja",       icon: "🪑", key: "meja",      group: "OPERASIONAL" },
-  { label: "Laporan Penjualan", icon: "📊", key: "laporan",   group: "OPERASIONAL" },
+  { label: "Dashboard",          icon: "⊞", key: "dashboard", group: "UTAMA" },
+  { label: "Kelola Menu",        icon: "🍽", key: "menu",      group: "OPERASIONAL" },
+  { label: "Kelola Stok",        icon: "📦", key: "stok",      group: "OPERASIONAL" },
+  { label: "Kelola Meja",        icon: "🪑", key: "meja",      group: "OPERASIONAL" },
+  { label: "Kelola Toko",        icon: "🏪", key: "toko",      group: "OPERASIONAL" },
+  { label: "Laporan Penjualan",  icon: "📊", key: "laporan",   group: "OPERASIONAL" },
 ];
 
+const TITLES = {
+  dashboard: "Dashboard",
+  menu:      "Kelola Menu",
+  stok:      "Kelola Stok",
+  meja:      "Kelola Meja",
+  toko:      "Kelola Toko",
+  laporan:   "Laporan Penjualan",
+};
+
+// ===================== SIDEBAR =====================
 const Sidebar = ({ page, setPage, sideOpen }) => (
   <div className="sidebar" style={{ width: sideOpen ? 220 : 0, minWidth: sideOpen ? 220 : 0 }}>
     <div className="sidebar-header">
@@ -95,6 +108,7 @@ const Sidebar = ({ page, setPage, sideOpen }) => (
   </div>
 );
 
+// ===================== TOPBAR =====================
 const Topbar = ({ title, setSideOpen, onLogout }) => {
   const now = new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   return (
@@ -114,6 +128,7 @@ const Topbar = ({ title, setSideOpen, onLogout }) => {
   );
 };
 
+// ===================== APP =====================
 export default function AdminApp() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -140,18 +155,17 @@ export default function AdminApp() {
 
   if (!loggedIn) return <LoginScreen onLogin={() => setLoggedIn(true)} />;
 
-  const titles = { dashboard: "Dashboard", menu: "Kelola Menu", stok: "Kelola Stok", meja: "Kelola Meja", laporan: "Laporan Penjualan" };
-
   return (
     <div className="app-container">
       <Sidebar page={page} setPage={setPage} sideOpen={sideOpen} />
       <div className="main-content">
-        <Topbar title={titles[page]} setSideOpen={setSideOpen} onLogout={handleLogout} />
+        <Topbar title={TITLES[page]} setSideOpen={setSideOpen} onLogout={handleLogout} />
         <div className="page-content">
           {page === "dashboard" && <DashboardScreen setPage={setPage} />}
           {page === "menu"      && <KelolaMenuScreen />}
           {page === "stok"      && <KelolaStokScreen />}
           {page === "meja"      && <KelolaMejaScreen />}
+          {page === "toko"      && <KelolaTokoScreen />}
           {page === "laporan"   && <LaporanScreen />}
         </div>
       </div>
