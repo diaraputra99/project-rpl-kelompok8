@@ -16,7 +16,7 @@ function QtyControl({ qty, onAdd, onRemove }) {
 
 function MenuCard({ item, qty, onAdd, onRemove }) {
   return (
-    <div className="menu-card">
+    <div className={`menu-card ${qty > 0 ? "in-cart" : ""}`}>
       <div className="menu-img-placeholder">
         {item.image_url ? (
           <img src={item.image_url} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />

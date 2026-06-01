@@ -184,12 +184,25 @@
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--card-shadow);
-  border: 1px solid var(--border);
-  transition: transform 0.15s;
+  border: 2px solid var(--border);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(139, 101, 8, 0.15);
+  border-color: var(--primary-light);
 }
 
 .menu-card:active {
   transform: scale(0.97);
+}
+
+/* Menu yang sudah ditambahkan ke cart */
+.menu-card.in-cart {
+  border: 2.5px solid var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light), var(--card-shadow);
 }
 
 .menu-img-placeholder {
