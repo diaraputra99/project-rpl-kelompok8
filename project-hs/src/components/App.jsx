@@ -25,7 +25,7 @@ function Toast({ message, visible }) {
 }
 
 // ===================== HAMBURGER DRAWER =====================
-function HamburgerDrawer({ open, onClose, screen, onNavigate, cartQty }) {
+function HamburgerDrawer({ open, onClose, screen, onNavigate, cartQty, tableNumber }) {
   if (!open) return null;
 
   const items = [
@@ -59,7 +59,7 @@ function HamburgerDrawer({ open, onClose, screen, onNavigate, cartQty }) {
               <div style={{ fontFamily: "'Playfair Display',serif", color: "#E8A020", fontSize: 17, fontWeight: 700, letterSpacing: 2 }}>
                 Warkop HS Balio
               </div>
-              <div style={{ fontSize: 11, color: "rgba(232,160,32,0.65)", marginTop: 3 }}>🪑 Meja 7 · Buka 24 Jam</div>
+              <div style={{ fontSize: 11, color: "rgba(232,160,32,0.65)", marginTop: 3 }}>🪑 Meja {tableNumber} · Buka 24 Jam</div>
             </div>
             <button onClick={onClose} style={{
               background: "rgba(255,255,255,0.12)", border: "none", color: "#fff",
@@ -432,9 +432,10 @@ function SuccessScreen({ orderCode, customerEmail, paymentMethod, tableNumber, o
 }
 
 // ===================== APP =====================
-export default function App() {
-  // FIX: Baca nomor meja dari URL ?meja=X, fallback ke 1
-  const tableNumber = Number(new URLSearchParams(window.location.search).get("meja")) || 1;
+export default function App({ tableNumber: tableFromUrl }) {
+  // Baca nomor meja: dari prop (dikirim main.jsx) ATAU dari URL langsung, fallback ke 1
+  const tableNumber = tableFromUrl
+    ?? (Number(new URLSearchParams(window.location.search).get("meja")) || 1);
 
   const [screen, setScreen]           = useState("splash");
   const [cart, setCart]               = useState({});
@@ -591,6 +592,7 @@ export default function App() {
           screen={screen}
           onNavigate={handleDrawerNav}
           cartQty={cartQty}
+          tableNumber={tableNumber}
         />
       )}
 
